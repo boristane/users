@@ -34,7 +34,7 @@ export async function publishToSNS(topicARN: string, message: object, correlatio
       correlationId,
     });
   } catch (error) {
-    logger.emergency({
+    logger.error({
       message: "Unable to publish message to sns.",
       data: {
         topicARN,

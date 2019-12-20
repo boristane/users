@@ -10,6 +10,11 @@
       "es2015"
     ],
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "preserveConstEnums": true,
+    "strictNullChecks": true,
+    "outDir": ".build",
+    "moduleResolution": "node",
+    "rootDir": "./"
   }
 }

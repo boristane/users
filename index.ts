@@ -1,15 +1,19 @@
 import { app } from "./src/server";
 import logger from "logger";
+import createConnectionToDB from "./src/utils/db-helper";
+import serverless from "serverless-http";
 
-const { PORT = 3000 } = process.env;
+const handler = serverless(app);
 
-app.listen(PORT, () => {
+export const server = async (event: any, context: any) => {
+  await createConnectionToDB();
   logger.info({
-    message: "Server started",
+    message: "Users started",
     data: {
-      port: PORT,
+      event,
     },
     correlationId: ""
   })
-});
+  return handler(event, context);
+}
 
