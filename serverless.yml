@@ -1,0 +1,22 @@
+service: users
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  memorySize: 512
+  stage: ${opt:stage}
+  deploymentBucket:
+    name: boristane-lambdas-deployments
+  region: eu-west-2
+  logRetentionInDays: 7
+  versionFunctions: false
+
+  environment:
+    ENV: ${opt:stage}
+
+functions:
+  server:
+    handler: index.server
+    events:
+      - http: ANY /
+      - http: 'ANY {proxy+}'
