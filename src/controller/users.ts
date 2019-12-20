@@ -36,10 +36,11 @@ export async function getAll(req: Request, res: Response, next: NextFunction) {
       }),
     };
 
+    res.locals.body = response;
     res.status(200).json(response);
     return next();
   } catch (err) {
-    send500(res, { message: "Unexpected error when getting all users" });
+    send500(res, { message: "Unexpected error when getting all users" }, err);
     return next();
   }
 }
@@ -91,8 +92,10 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
     };
 
     res.status(201).json(response);
+    next();
   } catch (err) {
-    send500(res, { message: "Unexpected error when creating user" });
+    send500(res, { message: "Unexpected error when creating user" }, err);
+    next();
   }
 }
 
@@ -113,13 +116,16 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     }
     const token = sign(user.email, process.env.JWT_KEY || "");
 
+    res.locals.body = { id: user.id, token }
     res.status(200).json({
       id: user.id,
       token,
       message: "Authentication successful."
     });
+    next();
   } catch (err) {
-    send500(res, { message: "Unexpected error when logging in user" });
+    send500(res, { message: "Unexpected error when logging in user" }, err);
+    next();
   }
 }
 
@@ -149,9 +155,12 @@ export async function getOne(req: Request, res: Response, next: NextFunction) {
       }
     };
 
+    res.locals.body = response;
     res.status(200).json(response);
+    next();
   } catch (err) {
-    send500(res, err);
+    send500(res, {message: "Error getting user"}, err);
+    next();
   }
 }
 
@@ -166,12 +175,15 @@ export async function del(req: Request, res: Response, next: NextFunction) {
 
     await getRepository(User).delete({ email });
 
+    res.locals.body = {id: user.id};
     res.status(200).json({
       message: "User succesfully deleted.",
       id: user.id,
     });
+    next();
   } catch (err) {
-    send500(res, { message: "Unexpected error when deleting user" });
+    send500(res, { message: "Unexpected error when deleting user" }, err);
+    next();
   }
 }
 
@@ -196,7 +208,8 @@ export async function activate(req: Request, res: Response, next: NextFunction) 
 
     await getRepository(User).save(user);
 
-    return res.status(200).json({
+    res.locals.body = {id: t.user.id};
+    res.status(200).json({
       message: "User succesfully activated.",
       id: t.user.id,
       request: {
@@ -204,7 +217,9 @@ export async function activate(req: Request, res: Response, next: NextFunction) 
         url: `/user/${t.user.id}`
       }
     });
+    next();
   } catch (err) {
-    send500(res, { message: "Unexpected error when activating user" });
+    send500(res, { message: "Unexpected error when activating user" }, err);
+    next();
   }
 }
