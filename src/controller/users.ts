@@ -66,6 +66,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
       phone,
       password: hashedPassword,
       activated: false,
+      optInMarketing: false,
     };
 
     const { token, expires } = createToken();
