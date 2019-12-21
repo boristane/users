@@ -39,6 +39,11 @@ export class User {
   })
   activated!: boolean;
 
+  @Column({
+    default: false
+  })
+  optInMarketing!: boolean;
+
   @OneToMany(type => ActivationToken, token => token.user, {
     onDelete: "CASCADE"
   })
