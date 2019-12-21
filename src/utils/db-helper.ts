@@ -3,14 +3,14 @@ import { ActivationToken } from "../model/ActivationToken";
 import { User } from "../model/User";
 import logger from "logger";
 
-export default async function createConnectionToDB(): Promise<Connection> {
+export async function createConnectionToDB(): Promise<Connection> {
   const connectionOptions: ConnectionOptions = {
     type: "mysql",
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT || "", 10),
     username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
     entities: [User, ActivationToken]
   };
   try {

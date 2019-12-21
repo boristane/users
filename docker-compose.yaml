@@ -1,0 +1,49 @@
+version: "3.7"
+
+services:
+  mysql:
+    container_name: mysql
+    image: mysql/mysql-server:5.7.15
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+    ports: ["3306:3306"]
+    networks:
+      users:
+        aliases:
+          - mysql
+  localstack:
+    container_name: localstack_users
+    image: 'localstack/localstack:0.10.4'
+    ports:
+      - '8888:8080'
+      - '4567-4584:4567-4584'
+    environment:
+      - 'SERVICES=s3,sqs,dynamodb,sns,kinesis,firehose'
+    networks:
+      users: null
+  users:
+    container_name: users
+    build: .
+    depends_on:
+      - mysql
+    volumes:
+      - $PWD:/var/users
+    command: ["bash", "-c", "tail -f /dev/null"]
+    environment:
+      - ENV=dev
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASS=password
+      - DB_PORT=3306
+      - DB_NAME=users
+      - JWT_KEY=jwt-key
+    ports:
+      - 8080:80
+    networks:
+      users:
+        aliases:
+          - host
+
+networks:
+  users:
+      external: false

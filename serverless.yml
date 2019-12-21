@@ -2,7 +2,7 @@ service: users
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs11.x
   memorySize: 512
   stage: ${opt:stage}
   deploymentBucket:
