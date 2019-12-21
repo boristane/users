@@ -1,0 +1,23 @@
+[
+  {
+    "forname": "brian",
+    "surname": "lol",
+    "email": "brian@lol.com",
+    "password": "password",
+    "phone": "011117845678"
+  },
+  {
+    "forename": "jaden",
+    "surname": "derek",
+    "email": "ddb@ovos.com",
+    "password": "gims",
+    "phone": "011117845678"
+  },
+  {
+    "forename": "kanye",
+    "surname": "west",
+    "email": "kanye@west.com",
+    "password": "houre",
+    "phone": "011117845678"
+  }
+]

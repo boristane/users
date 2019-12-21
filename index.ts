@@ -1,6 +1,6 @@
 import { app } from "./src/server";
 import logger from "logger";
-import createConnectionToDB from "./src/utils/db-helper";
+import { createConnectionToDB } from "./src/utils/db-helper";
 import serverless from "serverless-http";
 
 const handler = serverless(app);

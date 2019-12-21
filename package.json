@@ -16,6 +16,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "logger": "git+https://0b229f9c72ff31d5eb845ee2d111fd4d51a06f00:x-oauth-basic@github.com/boristane/logger.git",
+    "mysql": "^2.17.1",
     "serverless-http": "^2.3.0",
     "serverless-webpack": "^5.3.1",
     "ts-node": "^8.5.4",
@@ -32,10 +33,12 @@
     "@types/jsonwebtoken": "^8.3.5",
     "@types/lodash": "^4.14.149",
     "@types/node": "^12.12.21",
+    "@types/supertest": "^2.0.8",
     "@types/uuid": "^3.4.6",
     "@types/yup": "^0.26.26",
     "jest": "^24.9.0",
     "nodemon": "^2.0.2",
+    "supertest": "^4.0.2",
     "ts-jest": "^24.2.0"
   },
   "repository": {
