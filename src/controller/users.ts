@@ -1,9 +1,9 @@
 import { getRepository, getConnection } from "typeorm";
-import { User } from "../entity/User";
+import { User } from "../model/User";
 import { Request, Response, NextFunction } from "express";
 import { hash, compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
-import { ActivationToken } from "../entity/ActivationToken";
+import { ActivationToken } from "../model/ActivationToken";
 import { send404, send409, send500, send401, send410 } from "../utils/http-error-responses";
 import { ISignupRequest, ILoginRequest } from "../schema/users";
 import { createToken, sendTokenEmail } from "../utils/activation-tokens";
