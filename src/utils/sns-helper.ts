@@ -1,5 +1,5 @@
 import { SNS } from "aws-sdk";
-import logger = require("logger");
+import logger from "logger";
 
 export async function publishToSNS(topicARN: string, message: object, correlationId: string) {
   const region = process.env.SNS_REGION;
