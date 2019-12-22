@@ -7,6 +7,7 @@ const httpErrors = {
   unauthorized: "UNAUTHORIZED",
   forbidden: "FORBIDDEN",
   gone: "GONE",
+  badRequest: "BAD_REQUEST",
 }
 
 export interface IHTTPError {
@@ -37,4 +38,9 @@ export function send410(res: Response, error: IHTTPError) {
 export function send500(res: Response, error: IHTTPError, err?: any) {
   res.locals.body = err;
   res.status(500).json(Object.assign(error, { code: httpErrors.internalServerError }));
+}
+
+export function send400(res: Response, error: IHTTPError, err?: any) {
+  res.locals.body = err;
+  res.status(400).json(Object.assign(error, { code: httpErrors.badRequest }));
 }
