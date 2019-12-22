@@ -7,8 +7,10 @@ import { ActivationToken } from "../model/ActivationToken";
 import { send404, send409, send500, send401, send410 } from "../utils/http-error-responses";
 import { ISignupRequest, ILoginRequest } from "../schema/users";
 import { createToken, sendTokenEmail } from "../utils/activation-tokens";
+import logger from "logger";
 
 export async function getAll(req: Request, res: Response, next: NextFunction) {
+  const correlationId = res.get("x-correlation-id") || "";
   try {
     const userRepository = getRepository(User);
     const users = await userRepository.createQueryBuilder("user").getMany();
@@ -40,14 +42,21 @@ export async function getAll(req: Request, res: Response, next: NextFunction) {
     res.status(200).json(response);
     return next();
   } catch (err) {
-    send500(res, { message: "Unexpected error when getting all users" }, err);
+    const message = "Unexpected error when getting all users";
+    logger.error({
+      message,
+      data: req.body,
+      error: err,
+      correlationId,
+    });
+    send500(res, { message }, err);
     return next();
   }
 }
 
 export async function signup(req: Request, res: Response, next: NextFunction) {
+  const correlationId = res.get("x-correlation-id") || "";
   try {
-    const correlationId = res.get("x-correlation-id");
     const { email, forename, surname, password, phone }: ISignupRequest = req.body;
     const userRepository = getRepository(User);
 
@@ -95,27 +104,35 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
     res.status(201).json(response);
     next();
   } catch (err) {
-    send500(res, { message: "Unexpected error when creating user" }, err);
+    const message = "Unexpected error when creating user";
+    logger.error({
+      message,
+      data: req.body,
+      error: err,
+      correlationId,
+    });
+    send500(res, { message }, err);
     next();
   }
 }
 
 export async function login(req: Request, res: Response, next: NextFunction) {
+  const correlationId = res.get("x-correlation-id") || "";
   const { email, password }: ILoginRequest = req.body;
   try {
     const [user,] = await getRepository(User).find({ email });
     if (!user) {
-      send404(res, { message: "No User found with in the database" });
+      send401(res, { message: "Unauthorised operation" });
       return next();
     }
 
     const passwordCompare = await compare(password, user.password);
 
     if (!passwordCompare) {
-      send401(res,  { message: "Unauthorised operation" });
+      send401(res, { message: "Unauthorised operation" });
       return next();
     }
-    const token = sign(user.email, process.env.JWT_KEY || "");
+    const token = sign(user.email, process.env.JWT_USERS_KEY || "");
 
     res.locals.body = { id: user.id, token }
     res.status(200).json({
@@ -125,17 +142,25 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     });
     next();
   } catch (err) {
-    send500(res, { message: "Unexpected error when logging in user" }, err);
+    const message = "Unexpected error when logging in user";
+    logger.error({
+      message,
+      data: req.body,
+      error: err,
+      correlationId,
+    });
+    send500(res, { message }, err);
     next();
   }
 }
 
 export async function getOne(req: Request, res: Response, next: NextFunction) {
+  const correlationId = res.get("x-correlation-id") || "";
   const { id } = req.params;
   try {
-    const [user,] = await getRepository(User).find({ id: Number(id) }); 
+    const [user,] = await getRepository(User).find({ id: Number(id) });
     if (!user) {
-      send404(res, {message: "User not found"});
+      send404(res, { message: "User not found" });
       return next();
     }
 
@@ -160,15 +185,23 @@ export async function getOne(req: Request, res: Response, next: NextFunction) {
     res.status(200).json(response);
     next();
   } catch (err) {
-    send500(res, {message: "Error getting user"}, err);
+    const message = "Error getting user";
+    logger.error({
+      message,
+      data: req.body,
+      error: err,
+      correlationId,
+    });
+    send500(res, { message }, err);
     next();
   }
 }
 
 export async function del(req: Request, res: Response, next: NextFunction) {
+  const correlationId = res.get("x-correlation-id") || "";
   const { email } = req.query;
   try {
-    const user = await getRepository(User).findOne({email});
+    const user = await getRepository(User).findOne({ email });
     if (!user) {
       send404(res, { message: "User not found" });
       return next();
@@ -176,24 +209,30 @@ export async function del(req: Request, res: Response, next: NextFunction) {
 
     await getRepository(User).delete({ email });
 
-    res.locals.body = {id: user.id};
+    res.locals.body = { id: user.id };
     res.status(200).json({
       message: "User succesfully deleted.",
       id: user.id,
     });
     next();
   } catch (err) {
-    send500(res, { message: "Unexpected error when deleting user" }, err);
+    const message = "Unexpected error when deleting user";
+    logger.error({
+      message,
+      data: req.body,
+      error: err,
+      correlationId,
+    });
+    send500(res, { message }, err);
     next();
   }
 }
 
-
-
 export async function activate(req: Request, res: Response, next: NextFunction) {
+  const correlationId = res.get("x-correlation-id") || "";
   try {
     const { token } = req.params;
-    const t = await getRepository(ActivationToken).findOne({token});
+    const t = await getRepository(ActivationToken).findOne({ token });
 
     if (!t) {
       send404(res, { message: "Token not found" });
@@ -203,13 +242,13 @@ export async function activate(req: Request, res: Response, next: NextFunction) 
     const user = t.user;
 
     if (t.expires < new Date()) {
-      send410(res, {message: "Activation token expired"});
+      send410(res, { message: "Activation token expired" });
       return next();
     }
 
     await getRepository(User).save(user);
 
-    res.locals.body = {id: t.user.id};
+    res.locals.body = { id: t.user.id };
     res.status(200).json({
       message: "User succesfully activated.",
       id: t.user.id,
@@ -220,7 +259,14 @@ export async function activate(req: Request, res: Response, next: NextFunction) 
     });
     next();
   } catch (err) {
-    send500(res, { message: "Unexpected error when activating user" }, err);
+    const message = "Unexpected error when activating user";
+    logger.error({
+      message,
+      data: req.body,
+      error: err,
+      correlationId,
+    });
+    send500(res, { message }, err);
     next();
   }
 }

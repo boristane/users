@@ -17,3 +17,7 @@ export const server = async (event: any, context: any) => {
   return handler(event, context);
 }
 
+// app.listen(3333, () => {
+//   console.log("app listening");
+// });
+

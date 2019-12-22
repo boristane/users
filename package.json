@@ -4,7 +4,7 @@
   "description": "The module managing users",
   "main": "index.ts",
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles --runInBand --forceExit",
     "dev": "npx nodemon index.ts",
     "deploy:dev": "npm run build && sls deploy --stage dev",
     "build": "npx tsc"
@@ -12,6 +12,7 @@
   "dependencies": {
     "aws-sdk": "^2.593.0",
     "bcryptjs": "^2.4.3",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
