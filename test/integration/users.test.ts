@@ -9,7 +9,7 @@ import { sign } from "jsonwebtoken";
 import setupDB from "../utils/setupDb";
 import { promisify } from "util";
 import { getRepository } from "typeorm";
-import { User } from "../../src/model/User";
+import { User } from "../../src/entity/User";
 require("dotenv").config();
 
 jest.setTimeout(15000);

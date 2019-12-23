@@ -1,6 +1,6 @@
 import { createConnection, Connection, ConnectionOptions } from "typeorm";
-import { ActivationToken } from "../model/ActivationToken";
-import { User } from "../model/User";
+import { ActivationToken } from "../entity/ActivationToken";
+import { User } from "../entity/User";
 import logger from "logger";
 
 export async function createConnectionToDB(): Promise<Connection> {

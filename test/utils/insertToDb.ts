@@ -1,7 +1,7 @@
 import { hash } from "bcryptjs";
 import { getConnection, getRepository } from "typeorm";
-import { User } from "../../src/model/User";
-import { ActivationToken } from "../../src/model/ActivationToken";
+import { User } from "../../src/entity/User";
+import { ActivationToken } from "../../src/entity/ActivationToken";
 import moment = require("moment");
 
 export function insertUsers(users: Array<ITestUser>) {
