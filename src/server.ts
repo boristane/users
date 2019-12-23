@@ -2,7 +2,8 @@ import express, { Request, Response, NextFunction } from "express";
 import logger from "logger";
 import uuid from "uuid/v4";
 import * as _ from "lodash";
-import router from "./router/users";
+import usersRouter from "./router/users";
+import adminsRouter from "./router/admins";
 import { validateRequest } from "./controller/validation";
 
 const suppressLoggingPaths = ["/"];
@@ -58,5 +59,6 @@ export const app = express();
 app.use(express.json());
 app.use(requestLogger);
 app.use(validateRequest);
-app.use("/users/", router);
+app.use("/users/", usersRouter);
+app.use("/admins/", adminsRouter);
 app.use(responseLogger);

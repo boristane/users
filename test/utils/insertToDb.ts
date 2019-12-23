@@ -1,8 +1,9 @@
 import { hash } from "bcryptjs";
-import { getConnection, getRepository } from "typeorm";
+import { getRepository } from "typeorm";
 import { User } from "../../src/entity/User";
 import { ActivationToken } from "../../src/entity/ActivationToken";
 import moment = require("moment");
+import { Admin } from "../../src/entity/Admin";
 
 export function insertUsers(users: Array<ITestUser>) {
   const promises = users.map(async (user, index) => {
@@ -39,6 +40,20 @@ export async function insertActivationTokens(tokens: ITestActivationToken[]) {
   return Promise.all(promises);
 }
 
+export async function insertAdmins(tokens: ITestAdmin[]) {
+  const promises = tokens.map(async (admin, index) => {
+    const newAdmin: Admin = {
+      id: index + 1,
+      username: admin.username,
+      email: admin.email,
+      password: admin.password,
+      isSuperAdmin: admin.isSuperAdmin
+    };
+    return await getRepository(Admin).insert(newAdmin);
+  });
+  return Promise.all(promises);
+}
+
 export interface ITestUser {
   forename: string;
   surname: string;
@@ -51,4 +66,11 @@ export interface ITestActivationToken {
   token: string;
   expires?: string;
   user: number; 
+}
+
+export interface ITestAdmin {
+  username: string;
+  password: string;
+  email: string;
+  isSuperAdmin: boolean;
 }

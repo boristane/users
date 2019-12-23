@@ -2,6 +2,7 @@ import { createConnection, Connection, ConnectionOptions } from "typeorm";
 import { ActivationToken } from "../entity/ActivationToken";
 import { User } from "../entity/User";
 import logger from "logger";
+import { Admin } from "../entity/Admin";
 
 export async function createConnectionToDB(): Promise<Connection> {
   const connectionOptions: ConnectionOptions = {
@@ -11,7 +12,7 @@ export async function createConnectionToDB(): Promise<Connection> {
     username: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
-    entities: [User, ActivationToken]
+    entities: [User, ActivationToken, Admin]
   };
   try {
     const connection = await createConnection(connectionOptions);

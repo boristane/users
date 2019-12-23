@@ -1,9 +1,10 @@
 import { app } from "../../src/server";
 import request from "supertest";
 import { createConnectionToDB } from "../../src/utils/db-helper";
-import { insertUsers, ITestUser, insertActivationTokens, ITestActivationToken } from "../utils/insertToDb";
-import { removeUsersFromDB } from "../utils/removeFromDb";
+import { insertUsers, ITestUser, insertActivationTokens, ITestActivationToken, insertAdmins, ITestAdmin } from "../utils/insertToDb";
+import { removeAllFromDB } from "../utils/removeFromDb";
 import users from "../data/users.json";
+import admins from "../data/admins.json";
 import tokens from "../data/activation-tokens.json";
 import { sign } from "jsonwebtoken";
 import setupDB from "../utils/setupDb";
@@ -24,9 +25,10 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await removeUsersFromDB();
+  await removeAllFromDB();
   await insertUsers(users as ITestUser[]);
   await insertActivationTokens(tokens as ITestActivationToken[]);
+  await insertAdmins(admins as ITestAdmin[]);
 });
 
 describe("users listing", () => {
@@ -193,17 +195,18 @@ describe("delete", () => {
     expect(response.status).toBe(401);
   });
 
-  // it("should succesfully delete a user for admins", async () => {
-  //   const email = users[0].email;
-  //   const params = {
-  //     email
-  //   };
-  //   const token = sign(admins[0].email, process.env.JWT_ADMINS_KEY || "");
+  it("should succesfully delete a user for admins", async () => {
+    const email = users[0].email;
+    const params = {
+      email
+    };
+    const token = sign(admins[0].email, process.env.JWT_ADMINS_KEY || "");
 
-  //   const response = await request(app)
-  //     .delete("/users/")
-  //     .set("Authorization", `Bearer ${token}`);
+    const response = await request(app)
+      .delete("/users/")
+      .query(params)
+      .set("Authorization", `Bearer ${token}`);
 
-  //   expect(response.status).toBe(200);
-  // });
+    expect(response.status).toBe(200);
+  });
 });
