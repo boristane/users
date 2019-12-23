@@ -58,21 +58,21 @@ export async function create(req: Request, res: Response, next: NextFunction) {
 
     const { email, username, password, isSuperAdmin, superAdmin: superAdminEmail } = req.body;
     const superAdmin = await getRepository(Admin).findOneOrFail({ email: superAdminEmail });
-  
+
     if (!superAdmin.isSuperAdmin) {
       send401(res, { message: "Unauthorised operation" });
       return next();
     }
-  
+
     const [admin,] = await getRepository(Admin).find({ email });
     if (admin) {
       send409(res, { message: "Admin already created", target: `/admins/${admin.id}` })
       return next();
     }
-  
+
     const saltRounds = 10;
     const hashedPassword = await hash(password, saltRounds);
-  
+
     const newAdmin: Admin = {
       email,
       username,
@@ -81,9 +81,9 @@ export async function create(req: Request, res: Response, next: NextFunction) {
       created: new Date(),
       updated: new Date(),
     };
-  
+
     const result = await getRepository(Admin).save(newAdmin);
-    res.status(200).json({
+    res.status(201).json({
       message: "Admin created successfully.",
       user: {
         id: result.id,
@@ -109,9 +109,9 @@ export async function create(req: Request, res: Response, next: NextFunction) {
 
 export async function login(req: Request, res: Response, next: NextFunction) {
   const correlationId = res.get("x-correlation-id") || "";
-  const { email, password }: ILoginRequest = req.body;
   try {
-    const [admin,] = await getRepository(Admin).find({ email });
+    const { email, password }: ILoginRequest = req.body;
+    const [admin,] = await getRepository(Admin).find({ where: { email } });
     if (!admin) {
       send401(res, { message: "Unauthorised operation" });
       return next();
