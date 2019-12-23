@@ -1,5 +1,5 @@
 import { getConnection } from "typeorm";
-import { User } from "../../src/model/User";
+import { User } from "../../src/entity/User";
 
 export function removeUsersFromDB() {
   const promises = [];
