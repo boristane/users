@@ -1,9 +1,11 @@
 import { createConnectionToDB } from "../../src/utils/db-helper";
 import users from "../data/users.json";
-import { insertUsers } from "./insertToDb";
+import tokens from "../data/activation-tokens.json";
+import { insertUsers, insertActivationTokens } from "./insertToDb";
 
 async function populateDB() {
   await insertUsers(users);
+  await insertActivationTokens(tokens);
 }
 
 export default async function setupDb() {

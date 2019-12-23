@@ -232,7 +232,7 @@ export async function activate(req: Request, res: Response, next: NextFunction) 
   const correlationId = res.get("x-correlation-id") || "";
   try {
     const { token } = req.params;
-    const t = await getRepository(ActivationToken).findOne({ token });
+    const t = await getRepository(ActivationToken).findOne({ where: { token }, relations: ["user"] });
 
     if (!t) {
       send404(res, { message: "Token not found" });
@@ -246,6 +246,7 @@ export async function activate(req: Request, res: Response, next: NextFunction) 
       return next();
     }
 
+    user.activated = true;
     await getRepository(User).save(user);
 
     res.locals.body = { id: t.user.id };
@@ -262,7 +263,7 @@ export async function activate(req: Request, res: Response, next: NextFunction) 
     const message = "Unexpected error when activating user";
     logger.error({
       message,
-      data: req.body,
+      data: req.params,
       error: err,
       correlationId,
     });

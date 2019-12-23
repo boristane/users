@@ -1,12 +1,15 @@
 import { app } from "../../src/server";
 import request from "supertest";
 import { createConnectionToDB } from "../../src/utils/db-helper";
-import { insertUsers, IUser } from "../utils/insertToDb";
+import { insertUsers, ITestUser, insertActivationTokens, ITestActivationToken } from "../utils/insertToDb";
 import { removeUsersFromDB } from "../utils/removeFromDb";
 import users from "../data/users.json";
+import tokens from "../data/activation-tokens.json";
 import { sign } from "jsonwebtoken";
 import setupDB from "../utils/setupDb";
 import { promisify } from "util";
+import { getRepository } from "typeorm";
+import { User } from "../../src/model/User";
 require("dotenv").config();
 
 jest.setTimeout(15000);
@@ -22,7 +25,8 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await removeUsersFromDB();
-  await insertUsers(users as IUser[]);
+  await insertUsers(users as ITestUser[]);
+  await insertActivationTokens(tokens as ITestActivationToken[]);
 });
 
 describe("users listing", () => {
@@ -39,16 +43,12 @@ describe("users listing", () => {
     expect(response.status).toBe(404);
   });
 
-  // it("should return the correct valid user", async () => {
-  //   const id = 1;
-  //   const params = {
-  //     id
-  //   };
-  //   const url = buildUrl("/user/", params);
-  //   const response = await request(app).get(url);
-  //   expect(response.status).toBe(200);
-  //   expect(response.body.user.name).toEqual(users[0].name);
-  // });
+  it("should return the correct valid user", async () => {
+    const id = 1;
+    const response = await request(app).get(`/users/${id}`);
+    expect(response.status).toBe(200);
+    expect(response.body.user.email).toEqual(users[0].email);
+  });
 });
 
 describe("signup", () => {
@@ -92,27 +92,27 @@ describe("signup", () => {
 });
 
 describe("login", () => {
-  // it("should fail loging in a non-existing user", async () => {
-  //   const response = await request(app)
-  //     .post("/users/login")
-  //     .send({
-  //       email: "blabla@blabla.com",
-  //       password: "lmaohs15884fec"
-  //     });
+  it("should fail loging in a non-existing user", async () => {
+    const response = await request(app)
+      .post("/users/login")
+      .send({
+        email: "blabla@blabla.com",
+        password: "lmaohs15884fec"
+      });
 
-  //   expect(response.status).toBe(401);
-  // });
+    expect(response.status).toBe(401);
+  });
 
-  // it("should fail loging in a user with a wrong password", async () => {
-  //   const response = await request(app)
-  //     .post("/users/login")
-  //     .send({
-  //       email: users[0].email,
-  //       password: "error123548762"
-  //     });
+  it("should fail loging in a user with a wrong password", async () => {
+    const response = await request(app)
+      .post("/users/login")
+      .send({
+        email: users[0].email,
+        password: "error123548762"
+      });
 
-  //   expect(response.status).toBe(401);
-  // });
+    expect(response.status).toBe(401);
+  });
 
   it("should succesfully login a user", async () => {
     const response = await request(app)
@@ -124,6 +124,36 @@ describe("login", () => {
     expect(response.status).toBe(200);
     expect(response.body.message).toBe("Authentication successful.");
     expect(response.body.token).toBeTruthy();
+  });
+});
+
+describe("activation token", () => {
+  it("should activate a user", async () => {
+    const token = tokens[0];
+    const user = await getRepository(User).findOneOrFail({id: token.user});
+    expect(user.activated).toBeFalsy();
+    const response = await request(app).get(`/users/activate/${token.token}`);
+    const activatedUser = await getRepository(User).findOneOrFail({id: token.user});
+    expect(response.status).toBe(200);
+    expect(response.body.id).toEqual(token.user);
+    expect(activatedUser.activated).toBeTruthy();
+  });
+
+  it("should reject an expired token", async () => {
+    const token = tokens.find((t) => t.expires);
+    if (!token) throw new Error("The test data should have at least one expired token");
+    const user = await getRepository(User).findOneOrFail({id: token.user});
+    expect(user.activated).toBeFalsy();
+    const response = await request(app).get(`/users/activate/${token.token}`);
+    const activatedUser = await getRepository(User).findOneOrFail({id: token.user});
+    expect(response.status).toBe(410);
+    expect(activatedUser.activated).toBeFalsy();
+  });
+
+  it("should ignore a fake activation token", async () => {
+    const token = "123456789abethsk";
+    const response = await request(app).get(`/users/activate/${token}`);
+    expect(response.status).toBe(404);
   });
 });
 
