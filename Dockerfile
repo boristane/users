@@ -5,6 +5,6 @@ WORKDIR /var/users
 COPY package*.json /var/users/
 RUN npm i
 
-COPY . /var/uk-rail-module
+COPY . /var/users
 
 CMD bash -c "/var/users/run.sh"

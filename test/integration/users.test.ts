@@ -46,14 +46,22 @@ describe("users listing", () => {
 
   it("should return 404 on user not found", async () => {
     const id = 50;
-    const response = await request(app).get(`/users/${id}`);
+    const token = sign(users[0].email, process.env.JWT_USERS_KEY || "");
+    const response = await request(app).get(`/users/${id}`).set("Authorization", `Bearer ${token}`);
 
     expect(response.status).toBe(404);
   });
 
-  it("should return the correct valid user", async () => {
+  it("should fail if you're not logged in", async () => {
     const id = 1;
     const response = await request(app).get(`/users/${id}`);
+    expect(response.status).toBe(401);
+  });
+
+  it("should return the correct valid user", async () => {
+    const id = 1;
+    const token = sign(users[0].email, process.env.JWT_USERS_KEY || "");
+    const response = await request(app).get(`/users/${id}`).set("Authorization", `Bearer ${token}`);
     expect(response.status).toBe(200);
     expect(response.body.user.email).toEqual(users[0].email);
   });
@@ -138,10 +146,10 @@ describe("login", () => {
 describe("activation token", () => {
   it("should activate a user", async () => {
     const token = tokens[0];
-    const user = await getRepository(User).findOneOrFail({id: token.user});
+    const user = await getRepository(User).findOneOrFail({ id: token.user });
     expect(user.activated).toBeFalsy();
     const response = await request(app).get(`/users/activate/${token.token}`);
-    const activatedUser = await getRepository(User).findOneOrFail({id: token.user});
+    const activatedUser = await getRepository(User).findOneOrFail({ id: token.user });
     expect(response.status).toBe(200);
     expect(response.body.id).toEqual(token.user);
     expect(activatedUser.activated).toBeTruthy();
@@ -150,10 +158,10 @@ describe("activation token", () => {
   it("should reject an expired token", async () => {
     const token = tokens.find((t) => t.expires);
     if (!token) throw new Error("The test data should have at least one expired token");
-    const user = await getRepository(User).findOneOrFail({id: token.user});
+    const user = await getRepository(User).findOneOrFail({ id: token.user });
     expect(user.activated).toBeFalsy();
     const response = await request(app).get(`/users/activate/${token.token}`);
-    const activatedUser = await getRepository(User).findOneOrFail({id: token.user});
+    const activatedUser = await getRepository(User).findOneOrFail({ id: token.user });
     expect(response.status).toBe(410);
     expect(activatedUser.activated).toBeFalsy();
   });

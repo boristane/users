@@ -10,7 +10,6 @@ import { promisify } from "util";
 import { ICreateRequest } from "../../src/schema/admin";
 require("dotenv").config();
 
-jest.setTimeout(15000);
 
 let sleep = promisify(setTimeout);
 let connection;
@@ -45,14 +44,14 @@ describe("create", () => {
     const superAdmin = admins.find(admin => admin.isSuperAdmin)?.email;
     if (!superAdmin) {
       throw new Error("The test data should have at least one super admin");
-    } 
+    }
     const token = sign(superAdmin, process.env.JWT_ADMINS_KEY || "");
-    const admin : ICreateRequest = {
+    const admin: ICreateRequest = {
       username: "ddb",
       password: "lmao12345aa8",
       email: "jake@london.com",
       isSuperAdmin: false,
-      superAdmin, 
+      superAdmin,
     };
 
     const response = await request(app)
@@ -67,14 +66,14 @@ describe("create", () => {
     const superAdmin = admins.find(admin => admin.isSuperAdmin)?.email;
     if (!superAdmin) {
       throw new Error("The test data should have at least one super admin");
-    } 
+    }
     const token = sign(superAdmin, process.env.JWT_ADMINS_KEY || "");
-    const admin : ICreateRequest = {
+    const admin: ICreateRequest = {
       username: "ddb",
       password: "lmao12345aa8",
       email: superAdmin,
       isSuperAdmin: false,
-      superAdmin, 
+      superAdmin,
     };
 
     const response = await request(app)
@@ -92,12 +91,12 @@ describe("create", () => {
       throw new Error("The test data should have at least one super admin");
     }
     const token = sign(superAdmin, process.env.JWT_ADMINS_KEY || "");
-    const admin : ICreateRequest = {
+    const admin: ICreateRequest = {
       username: "ddb",
       password: "lmao12345aa8",
       email: "whateverfor real",
       isSuperAdmin: false,
-      superAdmin, 
+      superAdmin,
     };
 
     const response = await request(app)

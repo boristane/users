@@ -28,7 +28,7 @@ export function insertUsers(users: Array<ITestUser>) {
 
 export async function insertActivationTokens(tokens: ITestActivationToken[]) {
   const promises = tokens.map(async (token, index) => {
-    const user = await getRepository(User).findOneOrFail({id: token.user});
+    const user = await getRepository(User).findOneOrFail({ id: token.user });
     const newToken: ActivationToken = {
       id: index + 1,
       token: token.token,
@@ -42,11 +42,12 @@ export async function insertActivationTokens(tokens: ITestActivationToken[]) {
 
 export async function insertAdmins(tokens: ITestAdmin[]) {
   const promises = tokens.map(async (admin, index) => {
+    const hashedPassword = await hash(admin.password, 10);
     const newAdmin: Admin = {
       id: index + 1,
       username: admin.username,
       email: admin.email,
-      password: admin.password,
+      password: hashedPassword,
       isSuperAdmin: admin.isSuperAdmin
     };
     return await getRepository(Admin).insert(newAdmin);
@@ -65,7 +66,7 @@ export interface ITestUser {
 export interface ITestActivationToken {
   token: string;
   expires?: string;
-  user: number; 
+  user: number;
 }
 
 export interface ITestAdmin {
