@@ -11,7 +11,7 @@ import { userAuth, adminAuth } from "../auth/auth";
 
 const router = express.Router();
 
-router.get("/", getAll);
+router.get("/", adminAuth, getAll);
 router.post("/signup", signup);
 router.post("/login", login);
 router.get("/:id", getOne);

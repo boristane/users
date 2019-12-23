@@ -31,9 +31,15 @@ beforeEach(async () => {
 
 describe("users listing", () => {
   it("should list the correct number of users", async () => {
-    const response = await request(app).get("/users");
+    const token = sign(users[0].email, process.env.JWT_ADMINS_KEY || "");
+    const response = await request(app).get("/users").set("Authorization", `Bearer ${token}`);
     expect(response.status).toBe(200);
     expect(response.body.count).toBe(users.length);
+  });
+
+  it("should not list users if you're not admin", async () => {
+    const response = await request(app).get("/users").set("Authorization", `Bearer random-token`);
+    expect(response.status).toBe(401);
   });
 
   it("should return 404 on user not found", async () => {
