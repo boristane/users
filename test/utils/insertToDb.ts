@@ -1,8 +1,10 @@
 import { hash } from "bcryptjs";
-import { getConnection } from "typeorm";
+import { getConnection, getRepository } from "typeorm";
 import { User } from "../../src/model/User";
+import { ActivationToken } from "../../src/model/ActivationToken";
+import moment = require("moment");
 
-export function insertUsers(users: Array<IUser>) {
+export function insertUsers(users: Array<ITestUser>) {
   const promises = users.map(async (user, index) => {
     const saltRounds = 10;
     const hashedPassword = await hash(user.password, saltRounds);
@@ -18,22 +20,35 @@ export function insertUsers(users: Array<IUser>) {
       activated: false,
       optInMarketing: false,
     };
-    const result = await getConnection()
-      .createQueryBuilder()
-      .insert()
-      .orIgnore()
-      .into(User)
-      .values(newUser)
-      .execute();
-    return result;
+    return await getRepository(User).insert(newUser);
   });
   return Promise.all(promises);
 }
 
-export interface IUser {
+export async function insertActivationTokens(tokens: ITestActivationToken[]) {
+  const promises = tokens.map(async (token, index) => {
+    const user = await getRepository(User).findOneOrFail({id: token.user});
+    const newToken: ActivationToken = {
+      id: index + 1,
+      token: token.token,
+      user,
+      expires: token.expires ? new Date(token.expires) : moment().add(2, "days").toDate(),
+    };
+    return await getRepository(ActivationToken).insert(newToken);
+  });
+  return Promise.all(promises);
+}
+
+export interface ITestUser {
   forename: string;
   surname: string;
   password: string;
   email: string;
   phone: string;
+}
+
+export interface ITestActivationToken {
+  token: string;
+  expires?: string;
+  user: number; 
 }

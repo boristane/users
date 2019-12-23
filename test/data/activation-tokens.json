@@ -1,0 +1,15 @@
+[
+  {
+    "token": "abcdefghijk12345",
+    "user": 1
+  },
+  {
+    "token": "abcdefghijk12346",
+    "user": 2
+  },
+  {
+    "token": "abcdefghijk12347",
+    "expires": "2019-11-01",
+    "user": 3
+  }
+]
