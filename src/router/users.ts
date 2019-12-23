@@ -17,7 +17,7 @@ router.get("/:id", userAuth, getOne);
 router.get("/activate/:token", activate);
 router.post("/signup", signup);
 router.post("/login", login);
-router.patch("/", userAuth, edit);
-router.delete("/", adminAuth, del);
+router.patch("/:id", userAuth, edit);
+router.delete("/:id", adminAuth, del);
 
 export default router;

@@ -9,7 +9,6 @@ export const createSchema = yup.object().shape({
 });
 
 export const deleteSchema = yup.object().shape({
-  email: yup.string().email().required(),
   admin: yup.string().email().required()
 });
 

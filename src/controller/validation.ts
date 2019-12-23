@@ -48,8 +48,8 @@ export async function validateRequest(req: Request, res: Response, next: NextFun
 async function validateUserRequest(req: Request): Promise<boolean> {
   const { method } = req;
   if (method === "DELETE") {
-    const { email } = req.query;
-    if (!email) {
+    const id = getfirstParam(req.path);
+    if (!Number(id)) {
       throw new Error();
     }
     return true;
@@ -68,6 +68,10 @@ async function validateUserRequest(req: Request): Promise<boolean> {
 
   if (method === "PATCH") {
     await editSchema.validate(req.body);
+    const id = getfirstParam(req.path);
+    if (!Number(id)) {
+      throw new Error();
+    }
     return true;
   }
   return false;
@@ -76,6 +80,10 @@ async function validateUserRequest(req: Request): Promise<boolean> {
 async function validateAdminRequest(req: Request): Promise<boolean> {
   const { method } = req;
   if (method === "DELETE") {
+    const id = getfirstParam(req.path);
+    if (!Number(id)) {
+      throw new Error();
+    }
     await deleteSchema.validate(req.body);
     return true;
   }
@@ -91,4 +99,9 @@ async function validateAdminRequest(req: Request): Promise<boolean> {
     }
   }
   return false;
+}
+
+function getfirstParam(path: string): string {
+  const [, , id] = path.split("/");
+  return id;
 }

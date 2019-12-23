@@ -178,46 +178,45 @@ describe("edit", () => {
     const body = {
       forename: "Arnold",
       email: users[0].email,
-      id: "one"
     }
 
-    const response = await request(app).patch("/users").send(body);
+    const response = await request(app).patch("/users/one").send(body);
     expect(response.status).toEqual(400);
   });
 
   it("should reject editing if you're not logged in", async () => {
+    const id = 1;
     const body = {
       forename: "Arnold",
       email: users[0].email,
-      id: 1
     }
 
-    const response = await request(app).patch("/users").send(body);
+    const response = await request(app).patch(`/users/${id}`).send(body);
     expect(response.status).toEqual(401);
   });
 
   it("should fail if a different user tries to edit you", async () => {
+    const id = 1;
     const body = {
       forename: "Arnold",
       email: users[1].email,
-      id: 1
     }
     const token = sign(users[0].email, process.env.JWT_USERS_KEY || "");
-    const response = await request(app).patch("/users").send(body).set("Authorization", `Bearer ${token}`);
+    const response = await request(app).patch(`/users/${id}`).send(body).set("Authorization", `Bearer ${token}`);
     expect(response.status).toEqual(401);
   });
 
   it("should edit a user accrodingly", async () => {
+    const id = 1;
     const body = {
       forename: "Arnold",
       optInMarketing: true,
       email: users[0].email,
-      id: 1
     }
     const token = sign(users[1].email, process.env.JWT_USERS_KEY || "");
-    const response = await request(app).patch("/users").send(body).set("Authorization", `Bearer ${token}`);
+    const response = await request(app).patch(`/users/${id}`).send(body).set("Authorization", `Bearer ${token}`);
 
-    const user = await getRepository(User).findOneOrFail({ id: body.id });
+    const user = await getRepository(User).findOneOrFail({ id });
     expect(response.status).toEqual(200);
     expect(user.forename).toEqual(body.forename);
     expect(user.optInMarketing).toEqual(body.optInMarketing);
@@ -226,44 +225,32 @@ describe("edit", () => {
 
 describe("delete", () => {
   it("should respond with 404 on non-existing user", async () => {
-    const email = "random@nonexisting.com";
-    const params = {
-      email
-    };
+    const id = 12554;
     const token = sign(users[0].email, process.env.JWT_ADMINS_KEY || "");
     const response = await request(app)
-      .delete("/users")
-      .query(params)
+      .delete(`/users/${id}`)
       .set("Authorization", `Bearer ${token}`);
 
     expect(response.status).toBe(404);
   });
 
   it("should reject deletion for users", async () => {
-    const email = users[0].email;
-    const params = {
-      email
-    };
+    const id = 1
     const token = sign(users[0].email, process.env.JWT_USERS_KEY || "");
 
     const response = await request(app)
-      .delete("/users")
-      .query(params)
+      .delete(`/users/${id}`)
       .set("Authorization", `Bearer ${token}`);
 
     expect(response.status).toBe(401);
   });
 
   it("should succesfully delete a user for admins", async () => {
-    const email = users[0].email;
-    const params = {
-      email
-    };
+    const id = 1;
     const token = sign(admins[0].email, process.env.JWT_ADMINS_KEY || "");
 
     const response = await request(app)
-      .delete("/users/")
-      .query(params)
+      .delete(`/users/${id}`)
       .set("Authorization", `Bearer ${token}`);
 
     expect(response.status).toBe(200);

@@ -147,13 +147,13 @@ describe("login", () => {
 
 describe("delete", () => {
   it("should respond with 404 on non-existing admin", async () => {
-    const email = "random@nonexisting.com";
+    const id = 125448;
     const params = {
-      email, admin: admins[0].email,
+      admin: admins[0].email,
     };
     const token = sign(admins[0].email, process.env.JWT_ADMINS_KEY || "");
     const response = await request(app)
-      .delete("/admins")
+      .delete(`/admins/${id}`)
       .send(params)
       .set("Authorization", `Bearer ${token}`);
 
@@ -161,14 +161,14 @@ describe("delete", () => {
   });
 
   it("should reject deletion for non super admin admins", async () => {
-    const email = admins[0].email;
+    const id = 1;
     const params = {
-      email, admin: admins[1].email,
+      admin: admins[1].email,
     };
     const token = sign(admins[1].email, process.env.JWT_ADMINS_KEY || "");
 
     const response = await request(app)
-      .delete("/admins")
+      .delete(`/admins/${id}`)
       .send(params)
       .set("Authorization", `Bearer ${token}`);
 
@@ -176,14 +176,14 @@ describe("delete", () => {
   });
 
   it("should succesfully delete an admin for super admins", async () => {
-    const email = admins[1].email;
+    const id = 1;
     const params = {
-      email, admin: admins[0].email,
+      admin: admins[0].email,
     };
     const token = sign(admins[0].email, process.env.JWT_ADMINS_KEY || "");
 
     const response = await request(app)
-      .delete("/admins/")
+      .delete(`/admins/${id}`)
       .send(params)
       .set("Authorization", `Bearer ${token}`);
 

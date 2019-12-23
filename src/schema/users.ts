@@ -19,7 +19,6 @@ export const editSchema = yup.object().shape({
   phone: yup.string().notRequired(),
   optInMarketing: yup.boolean().notRequired(),
   email: yup.string().email().required(),
-  id: yup.number().integer().positive().required(),
 });
 
 const getOneSchema = yup.object().shape({ id: yup.number().required() });

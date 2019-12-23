@@ -147,9 +147,10 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
 export async function del(req: Request, res: Response, next: NextFunction) {
   const correlationId = res.get("x-correlation-id") || "";
-  const { email, admin: adminEmail } = req.body;
   try {
-    const admin = await getRepository(Admin).findOne({ email });
+    const { id } = req.params;
+    const { admin: adminEmail } = req.body;
+    const admin = await getRepository(Admin).findOne({ id: Number(id) });
     if (!admin) {
       send404(res, { message: "Admin not found" });
       return next();
@@ -161,7 +162,7 @@ export async function del(req: Request, res: Response, next: NextFunction) {
       return next();
     }
 
-    await getRepository(Admin).delete({ email });
+    await getRepository(Admin).delete({ id: Number(id) });
 
     res.locals.body = { id: admin.id };
     res.status(200).json({
