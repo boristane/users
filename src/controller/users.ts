@@ -200,8 +200,9 @@ export async function getOne(req: Request, res: Response, next: NextFunction) {
 export async function edit(req: Request, res: Response, next: NextFunction) {
   const correlationId = res.get("x-correlation-id") || "";
   try {
-    const { forename, surname, phone, optInMarketing, email, id }: IEditRequest = req.body;
-    const user = await getRepository(User).findOne({ id });
+    const { id } = req.params;
+    const { forename, surname, phone, optInMarketing, email }: IEditRequest = req.body;
+    const user = await getRepository(User).findOne({ id: Number(id) });
 
     if (!user) {
       send404(res, { message: "User not found" });
@@ -247,15 +248,15 @@ export async function edit(req: Request, res: Response, next: NextFunction) {
 
 export async function del(req: Request, res: Response, next: NextFunction) {
   const correlationId = res.get("x-correlation-id") || "";
-  const { email } = req.query;
+  const { id } = req.params;
   try {
-    const user = await getRepository(User).findOne({ email });
+    const user = await getRepository(User).findOne({ id: Number(id) });
     if (!user) {
       send404(res, { message: "User not found" });
       return next();
     }
 
-    await getRepository(User).delete({ email });
+    await getRepository(User).delete({ id: Number(id) });
 
     res.locals.body = { id: user.id };
     res.status(200).json({
@@ -267,7 +268,7 @@ export async function del(req: Request, res: Response, next: NextFunction) {
     const message = "Unexpected error when deleting user";
     logger.error({
       message,
-      data: req.query,
+      data: req.params,
       error: err,
       correlationId,
     });

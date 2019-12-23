@@ -5,19 +5,19 @@ import serverless from "serverless-http";
 
 const handler = serverless(app);
 
-export const server = async (event: any, context: any) => {
-  await createConnectionToDB();
-  logger.info({
-    message: "Users started",
-    data: {
-      event,
-    },
-    correlationId: ""
-  })
-  return handler(event, context);
-}
+// export const server = async (event: any, context: any) => {
+//   await createConnectionToDB();
+//   logger.info({
+//     message: "Users started",
+//     data: {
+//       event,
+//     },
+//     correlationId: ""
+//   })
+//   return handler(event, context);
+// }
 
-// app.listen(3333, () => {
-//   console.log("app listening");
-// });
+app.listen(3333, () => {
+  console.log("app listening");
+});
 

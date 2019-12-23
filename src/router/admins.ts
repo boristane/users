@@ -12,6 +12,6 @@ const router = express.Router();
 router.get("/", adminAuth, getAll);
 router.post("/", adminAuth, create);
 router.post("/login", login);
-router.delete("/", adminAuth, del);
+router.delete("/:id", adminAuth, del);
 
 export default router;
