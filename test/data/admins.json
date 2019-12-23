@@ -1,0 +1,14 @@
+[
+  {
+    "username": "mario",
+    "email": "mario@nintenda.com",
+    "password": "gimslefablack",
+    "isSuperAdmin": true
+  },
+  {
+    "username": "luidji",
+    "email": "luidji@nintenda.com",
+    "password": "gimslefablack",
+    "isSuperAdmin": false
+  }
+]

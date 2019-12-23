@@ -1,21 +1,17 @@
 import express from "express";
 import {
   getAll,
-  signup,
+  create,
   login,
-  getOne,
   del,
-  activate
-} from "../controller/users";
-import { userAuth, adminAuth } from "../auth/auth";
+} from "../controller/admins";
+import { adminAuth } from "../auth/auth";
 
 const router = express.Router();
 
 router.get("/", adminAuth, getAll);
-router.post("/signup", signup);
+router.post("/", adminAuth, create);
 router.post("/login", login);
-router.get("/:id", userAuth ,getOne);
 router.delete("/", adminAuth, del);
-router.get("/activate/:token", activate);
 
 export default router;

@@ -219,7 +219,7 @@ export async function del(req: Request, res: Response, next: NextFunction) {
     const message = "Unexpected error when deleting user";
     logger.error({
       message,
-      data: req.body,
+      data: req.query,
       error: err,
       correlationId,
     });
