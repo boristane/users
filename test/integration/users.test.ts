@@ -9,7 +9,7 @@ import tokens from "../data/activation-tokens.json";
 import { sign } from "jsonwebtoken";
 import setupDB from "../utils/setupDb";
 import { promisify } from "util";
-import { getRepository } from "typeorm";
+import { getRepository, getTreeRepository } from "typeorm";
 import { User } from "../../src/entity/User";
 require("dotenv").config();
 
@@ -170,6 +170,57 @@ describe("activation token", () => {
     const token = "123456789abethsk";
     const response = await request(app).get(`/users/activate/${token}`);
     expect(response.status).toBe(404);
+  });
+});
+
+describe("edit", () => {
+  it("should fail if the schema is not validated", async () => {
+    const body = {
+      forename: "Arnold",
+      email: users[0].email,
+      id: "one"
+    }
+
+    const response = await request(app).patch("/users").send(body);
+    expect(response.status).toEqual(400);
+  });
+
+  it("should reject editing if you're not logged in", async () => {
+    const body = {
+      forename: "Arnold",
+      email: users[0].email,
+      id: 1
+    }
+
+    const response = await request(app).patch("/users").send(body);
+    expect(response.status).toEqual(401);
+  });
+
+  it("should fail if a different user tries to edit you", async () => {
+    const body = {
+      forename: "Arnold",
+      email: users[1].email,
+      id: 1
+    }
+    const token = sign(users[0].email, process.env.JWT_USERS_KEY || "");
+    const response = await request(app).patch("/users").send(body).set("Authorization", `Bearer ${token}`);
+    expect(response.status).toEqual(401);
+  });
+
+  it("should edit a user accrodingly", async () => {
+    const body = {
+      forename: "Arnold",
+      optInMarketing: true,
+      email: users[0].email,
+      id: 1
+    }
+    const token = sign(users[1].email, process.env.JWT_USERS_KEY || "");
+    const response = await request(app).patch("/users").send(body).set("Authorization", `Bearer ${token}`);
+
+    const user = await getRepository(User).findOneOrFail({ id: body.id });
+    expect(response.status).toEqual(200);
+    expect(user.forename).toEqual(body.forename);
+    expect(user.optInMarketing).toEqual(body.optInMarketing);
   });
 });
 
