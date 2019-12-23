@@ -5,17 +5,19 @@ import {
   login,
   getOne,
   del,
-  activate
+  activate,
+  edit
 } from "../controller/users";
 import { userAuth, adminAuth } from "../auth/auth";
 
 const router = express.Router();
 
 router.get("/", adminAuth, getAll);
+router.get("/:id", userAuth, getOne);
+router.get("/activate/:token", activate);
 router.post("/signup", signup);
 router.post("/login", login);
-router.get("/:id", userAuth ,getOne);
+router.patch("/", userAuth, edit);
 router.delete("/", adminAuth, del);
-router.get("/activate/:token", activate);
 
 export default router;

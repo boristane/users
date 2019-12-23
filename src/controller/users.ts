@@ -5,7 +5,7 @@ import { hash, compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { ActivationToken } from "../entity/ActivationToken";
 import { send404, send409, send500, send401, send410 } from "../utils/http-error-responses";
-import { ISignupRequest, ILoginRequest } from "../schema/users";
+import { ISignupRequest, ILoginRequest, IEditRequest } from "../schema/users";
 import { createToken, sendTokenEmail } from "../utils/activation-tokens";
 import logger from "logger";
 
@@ -186,6 +186,54 @@ export async function getOne(req: Request, res: Response, next: NextFunction) {
     next();
   } catch (err) {
     const message = "Error getting user";
+    logger.error({
+      message,
+      data: req.body,
+      error: err,
+      correlationId,
+    });
+    send500(res, { message }, err);
+    next();
+  }
+}
+
+export async function edit(req: Request, res: Response, next: NextFunction) {
+  const correlationId = res.get("x-correlation-id") || "";
+  try {
+    const { forename, surname, phone, optInMarketing, email, id }: IEditRequest = req.body;
+    const user = await getRepository(User).findOne({ id });
+
+    if (!user) {
+      send404(res, { message: "User not found" });
+      return next();
+    }
+
+    if (user.email !== email) {
+      send401(res, { message: "Unauthorised operation" });
+      return next();
+    }
+    user.forename = forename || user.forename;
+    user.surname = surname || user.surname;
+    user.phone = phone || user.phone;
+    user.optInMarketing = optInMarketing || user.optInMarketing;
+
+    const result = await getRepository(User).save(user);
+    const response = {
+      message: "User updated successfully.",
+      user: {
+        id: result.id,
+        updated: result.updated
+      },
+      request: {
+        type: "GET",
+        url: `/users/${result.id}`
+      }
+    };
+
+    res.status(200).json(response);
+    next();
+  } catch (err) {
+    const message = "Error editing user";
     logger.error({
       message,
       data: req.body,
