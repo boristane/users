@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "test": "jest --detectOpenHandles --runInBand --forceExit",
-    "dev": "npx nodemon index.ts",
+    "dev": "npx nodemon server.ts",
     "deploy:dev": "npm run build && sls deploy --stage dev",
     "build": "npx tsc"
   },
