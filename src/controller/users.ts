@@ -87,7 +87,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
     newUser.activationTokens = [activationToken];
 
     const result = await userRepository.save(newUser);
-    await sendTokenEmail(email, token, expires, correlationId);
+    sendTokenEmail(email, token, expires, correlationId);
 
     const response = {
       message: "User created successfully.",
