@@ -1,4 +1,4 @@
-import { app } from "../../src/server";
+import { app } from "../../src/app";
 import request from "supertest";
 import { createConnectionToDB } from "../../src/utils/db-helper";
 import { insertUsers, ITestUser, insertActivationTokens, ITestActivationToken, insertAdmins, ITestAdmin } from "../utils/insertToDb";
