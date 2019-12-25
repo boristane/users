@@ -166,6 +166,17 @@ describe("activation token", () => {
     expect(activatedUser.activated).toBeFalsy();
   });
 
+  it("should reject a used token", async () => {
+    const token = tokens.find((t) => t.used);
+    if (!token) throw new Error("The test data should have at least one expired token");
+    const user = await getRepository(User).findOneOrFail({ id: token.user });
+    expect(user.activated).toBeFalsy();
+    const response = await request(app).get(`/users/activate/${token.token}`);
+    const activatedUser = await getRepository(User).findOneOrFail({ id: token.user });
+    expect(response.status).toBe(410);
+    expect(activatedUser.activated).toBeFalsy();
+  });
+
   it("should ignore a fake activation token", async () => {
     const token = "123456789abethsk";
     const response = await request(app).get(`/users/activate/${token}`);
@@ -281,5 +292,35 @@ describe("Get forgotten password token", () => {
       .send({ email });
     expect(result.status).toEqual(200);
     expect(result.body.message).toEqual("Forgotten password token sent.");
+  });
+});
+
+describe("Check forgottem password token", () => {
+  it("should respond with 200 on a valid token", async () => {
+    const token = tokens[0];
+    const response = await request(app).get(`/users/password-token/${token.token}`);
+    expect(response.status).toBe(200);
+    expect(response.header['location']).toEqual(process.env.FORGOTTEN_PASSWORD_URL);
+    expect(response.header['user-id']).toEqual("1");
+  });
+
+  it("should reject an expired token", async () => {
+    const token = tokens.find((t) => t.expires);
+    if (!token) throw new Error("The test data should have at least one expired token");
+    const response = await request(app).get(`/users/password-token/${token.token}`);
+    expect(response.status).toBe(410);
+  });
+
+  it("should reject a used token", async () => {
+    const token = tokens.find((t) => t.used);
+    if (!token) throw new Error("The test data should have at least one expired token");
+    const response = await request(app).get(`/users/password-token/${token.token}`);
+    expect(response.status).toBe(410);
+  });
+
+  it("should ignore a fake activation token", async () => {
+    const token = "fake56789abethsk";
+    const response = await request(app).get(`/users/password-token/${token}`);
+    expect(response.status).toBe(404);
   });
 });

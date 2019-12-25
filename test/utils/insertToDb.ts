@@ -34,6 +34,7 @@ export async function insertActivationTokens(tokens: ITestActivationToken[]) {
       token: token.token,
       user,
       expires: token.expires ? new Date(token.expires) : moment().add(2, "days").toDate(),
+      used: token.used
     };
     return await getRepository(ActivationToken).insert(newToken);
   });
@@ -67,6 +68,7 @@ export interface ITestActivationToken {
   token: string;
   expires?: string;
   user: number;
+  used: boolean;
 }
 
 export interface ITestAdmin {
