@@ -383,13 +383,57 @@ export async function checkPasswordToken(req: Request, res: Response, next: Next
       return next();
     }
 
-    t.used = true;
-    await getRepository(ActivationToken).save(t);
-    res.header("user-id", (t.user.id)?.toString());
+    res.header("token", t.token);
     res.redirect(200, process.env.FORGOTTEN_PASSWORD_URL || "");
     next();
   } catch (err) {
     const message = "Unexpected error when getting token to reset password";
+    logger.error({
+      message,
+      data: req.params,
+      error: err,
+      correlationId,
+    });
+    send500(res, { message }, err);
+    next();
+  }
+}
+
+export async function resetPassword(req: Request, res: Response, next: NextFunction) {
+  const correlationId = res.get("x-correlation-id") || "";
+  try {
+    const { password, token } = req.body;
+    const t = await getRepository(ActivationToken).findOne({ where: { token }, relations: ["user"] });
+
+    if (!t) {
+      send404(res, { message: "Activation Token not found" });
+      return next();
+    }
+
+    if (t.expires < new Date()) {
+      send410(res, { message: "Activation token expired" });
+      return next();
+    }
+    if (t.used) {
+      send410(res, { message: "Activation token already used" });
+      return next();
+    }
+
+    t.used = true;
+    await getRepository(ActivationToken).save(t);
+    const saltRounds = 10;
+    const hashedPassword = await hash(password, saltRounds);
+
+    const user = t.user;
+
+    user.password = hashedPassword;
+    await getRepository(User).save(user);
+    res.status(200).json({
+      message: "Password succesfully updated",
+    });
+    next();
+  } catch (err) {
+    const message = "Failed to reset the password";
     logger.error({
       message,
       data: req.params,

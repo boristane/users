@@ -8,7 +8,8 @@ import {
   activate,
   edit,
   sendPasswordToken,
-  checkPasswordToken
+  checkPasswordToken,
+  resetPassword
 } from "../controller/users";
 import { userAuth, adminAuth } from "../auth/auth";
 
@@ -21,6 +22,7 @@ router.post("/password-token", sendPasswordToken);
 router.get("/password-token/:token", checkPasswordToken);
 router.post("/signup", signup);
 router.post("/login", login);
+router.post("/reset-password", resetPassword);
 router.patch("/:id", userAuth, edit);
 router.delete("/:id", adminAuth, del);
 
