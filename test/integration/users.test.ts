@@ -256,3 +256,30 @@ describe("delete", () => {
     expect(response.status).toBe(200);
   });
 });
+
+describe("Get forgotten password token", () => {
+  it("should respond with 404 for a user not found", async () => {
+    const email = "dont@exist.lol";
+    const result = await request(app)
+      .post("/users/password-token")
+      .send({ email });
+    expect(result.status).toEqual(404);
+  });
+
+  it("should respond with 400 for a bad request", async () => {
+    const email = "notemail";
+    const result = await request(app)
+      .post("/users/password-token")
+      .send({ email });
+    expect(result.status).toEqual(400);
+  });
+
+  it("should work for an existing user", async () => {
+    const email = users[0].email;
+    const result = await request(app)
+      .post("/users/password-token")
+      .send({ email });
+    expect(result.status).toEqual(200);
+    expect(result.body.message).toEqual("Forgotten password token sent.");
+  });
+});

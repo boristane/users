@@ -21,6 +21,6 @@ aws sns create-topic --name emails --endpoint-url 'http://localhost:4575' --regi
 
 docker exec -t mysql mysql -h 127.0.0.1 -u root -ppassword -e "create database users" || true
 docker exec -t users npx ts-node ./test/setupDb.ts
-docker exec -t -e LOG_LEVEL=emergency users npm run test
+docker exec -t -e LOG_LEVEL=error users npm run test
 
 # docker-compose down

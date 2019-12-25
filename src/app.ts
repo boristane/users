@@ -1,7 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import logger from "logger";
 import uuid from "uuid/v4";
-import * as _ from "lodash";
 import usersRouter from "./router/users";
 import adminsRouter from "./router/admins";
 import { validateRequest } from "./controller/validation";
@@ -24,7 +23,7 @@ function requestLogger(
       message: "REQUEST",
       data: {
         url: req.url,
-        body: _.omit(req.body, ommitedInLogs),
+        body: req.body,
         query: req.query,
         method: req.method,
       },
