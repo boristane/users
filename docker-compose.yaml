@@ -41,6 +41,7 @@ services:
       - EMAIL_SNS_TOPIC_ARN=arn:aws:sns:us-west-1:000000000000:emails
       - SNS_REGION=us-west-1
       - SNS_ENDPOINT='http://localhost:4575'
+      - FORGOTTEN_PASSWORD_URL='http://google.com'
     ports:
       - 8080:80
     networks:

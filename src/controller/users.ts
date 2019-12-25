@@ -8,6 +8,7 @@ import { send404, send409, send500, send401, send410 } from "../utils/http-error
 import { ISignupRequest, ILoginRequest, IEditRequest } from "../schema/users";
 import { createToken, sendActivationTokenEmail, sendPasswordResetTokenEmail } from "../utils/activation-tokens";
 import logger from "logger";
+import moment from "moment";
 
 export async function getAll(req: Request, res: Response, next: NextFunction) {
   const correlationId = res.get("x-correlation-id") || "";
@@ -83,6 +84,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
       token,
       expires,
       user: newUser,
+      used: false,
     };
     newUser.activationTokens = [activationToken];
 
@@ -287,15 +289,20 @@ export async function activate(req: Request, res: Response, next: NextFunction) 
       send404(res, { message: "Token not found" });
       return next();
     }
-
-    const user = t.user;
-
     if (t.expires < new Date()) {
       send410(res, { message: "Activation token expired" });
       return next();
     }
+    if (t.used) {
+      send410(res, { message: "Activation token already used" });
+      return next();
+    }
+
+    const user = t.user;
 
     user.activated = true;
+    t.used = true;
+    await getRepository(ActivationToken).save(t);
     await getRepository(User).save(user);
 
     res.locals.body = { id: t.user.id };
@@ -336,6 +343,7 @@ export async function sendPasswordToken(req: Request, res: Response, next: NextF
       token,
       expires,
       user,
+      used: false,
     };
     user.activationTokens?.push(passwordToken);
     sendPasswordResetTokenEmail(user.email, token, expires, correlationId);
@@ -348,6 +356,43 @@ export async function sendPasswordToken(req: Request, res: Response, next: NextF
     logger.error({
       message,
       data: req.body,
+      error: err,
+      correlationId,
+    });
+    send500(res, { message }, err);
+    next();
+  }
+}
+
+export async function checkPasswordToken(req: Request, res: Response, next: NextFunction) {
+  const correlationId = res.get("x-correlation-id") || "";
+  try {
+    const { token } = req.params;
+    const t = await getRepository(ActivationToken).findOne({ where: { token }, relations: ["user"] });
+    if (!t) {
+      send404(res, { message: "Activation Token not found" });
+      return next();
+    }
+
+    if (t.expires < new Date()) {
+      send410(res, { message: "Activation token expired" });
+      return next();
+    }
+    if (t.used) {
+      send410(res, { message: "Activation token already used" });
+      return next();
+    }
+
+    t.used = true;
+    await getRepository(ActivationToken).save(t);
+    res.header("user-id", (t.user.id)?.toString());
+    res.redirect(200, process.env.FORGOTTEN_PASSWORD_URL || "");
+    next();
+  } catch (err) {
+    const message = "Unexpected error when getting token to reset password";
+    logger.error({
+      message,
+      data: req.params,
       error: err,
       correlationId,
     });

@@ -21,4 +21,7 @@ export class ActivationToken {
 
   @Column({ type: "timestamp" })
   expires!: Date;
+
+  @Column( {default: false} )
+  used!: boolean;
 }

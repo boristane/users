@@ -1,15 +1,23 @@
 [
   {
     "token": "abcdefghijk12345",
-    "user": 1
+    "user": 1,
+    "used": false
   },
   {
     "token": "abcdefghijk12346",
-    "user": 2
+    "user": 2,
+    "used": false
   },
   {
     "token": "abcdefghijk12347",
     "expires": "2019-11-01",
-    "user": 3
+    "user": 3,
+    "used": false
+  },
+  {
+    "token": "abcdefgjgtk12347",
+    "user": 3,
+    "used": true
   }
 ]
