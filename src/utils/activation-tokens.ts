@@ -1,4 +1,5 @@
 import { publishToSNS } from "./sns-helper";
+import { User } from "../entity/User";
 
 export function createToken(): { token: string; expires: Date } {
   const chars =
@@ -18,14 +19,20 @@ export function createToken(): { token: string; expires: Date } {
   return token;
 }
 
-export async function sendActivationTokenEmail(email: string, token: string, expires: Date, correlationId: string) {
-  const message = { emailType: "ACTIVATION_TOKEN", data: { email, token, expires: expires.toUTCString() } }
+export async function sendActivationTokenEmail(user: User, token: string, expires: Date, correlationId: string) {
+  const message = { emailType: "ACTIVATION_TOKEN", data: { user: getEmailUser(user), token, expires: expires.toUTCString() } }
   const topicArn = process.env.EMAIL_SNS_TOPIC_ARN || "";
   await publishToSNS(topicArn, message, correlationId);
 }
 
-export async function sendPasswordResetTokenEmail(email: string, token: string, expires: Date, correlationId: string) {
-  const message = { emailType: "PASSWORD_RESET_TOKEN", data: { email, token, expires: expires.toUTCString() } }
+export async function sendPasswordResetTokenEmail(user: User, token: string, expires: Date, correlationId: string) {
+  const message = { emailType: "PASSWORD_RESET_TOKEN", data: { user: getEmailUser(user), token, expires: expires.toUTCString() } }
   const topicArn = process.env.EMAIL_SNS_TOPIC_ARN || "";
   await publishToSNS(topicArn, message, correlationId);
+}
+
+function getEmailUser(user: User) {
+  const result = {...user};
+  result.password = "";
+  return result;
 }
