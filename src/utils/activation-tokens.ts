@@ -18,8 +18,14 @@ export function createToken(): { token: string; expires: Date } {
   return token;
 }
 
-export async function sendTokenEmail(email: string, token: string, expires: Date, correlationId: string) {
+export async function sendActivationTokenEmail(email: string, token: string, expires: Date, correlationId: string) {
   const message = { emailType: "ACTIVATION_TOKEN", data: { email, token, expires: expires.toUTCString() } }
+  const topicArn = process.env.EMAIL_SNS_TOPIC_ARN || "";
+  await publishToSNS(topicArn, message, correlationId);
+}
+
+export async function sendPasswordResetTokenEmail(email: string, token: string, expires: Date, correlationId: string) {
+  const message = { emailType: "PASSWORD_RESET_TOKEN", data: { email, token, expires: expires.toUTCString() } }
   const topicArn = process.env.EMAIL_SNS_TOPIC_ARN || "";
   await publishToSNS(topicArn, message, correlationId);
 }

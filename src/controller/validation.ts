@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import logger from "logger";
 import { send400 } from "../utils/http-error-responses";
-import { signupSchema, loginSchema, editSchema } from "../schema/users";
+import { signupSchema, loginSchema, editSchema, sendPasswordTokenSchema } from "../schema/users";
 import { createSchema, deleteSchema } from "../schema/admin";
 
 export async function validateRequest(req: Request, res: Response, next: NextFunction) {
@@ -62,6 +62,10 @@ async function validateUserRequest(req: Request): Promise<boolean> {
     }
     if (req.path === "/users/login") {
       await loginSchema.validate(req.body);
+      return true;
+    }
+    if (req.path === "/users/password-token") {
+      await sendPasswordTokenSchema.validate(req.body);
       return true;
     }
   }

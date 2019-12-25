@@ -6,7 +6,7 @@ import { sign } from "jsonwebtoken";
 import { ActivationToken } from "../entity/ActivationToken";
 import { send404, send409, send500, send401, send410 } from "../utils/http-error-responses";
 import { ISignupRequest, ILoginRequest, IEditRequest } from "../schema/users";
-import { createToken, sendTokenEmail } from "../utils/activation-tokens";
+import { createToken, sendActivationTokenEmail, sendPasswordResetTokenEmail } from "../utils/activation-tokens";
 import logger from "logger";
 
 export async function getAll(req: Request, res: Response, next: NextFunction) {
@@ -87,7 +87,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
     newUser.activationTokens = [activationToken];
 
     const result = await userRepository.save(newUser);
-    sendTokenEmail(email, token, expires, correlationId);
+    await sendActivationTokenEmail(email, token, expires, correlationId);
 
     const response = {
       message: "User created successfully.",
@@ -313,6 +313,41 @@ export async function activate(req: Request, res: Response, next: NextFunction) 
     logger.error({
       message,
       data: req.params,
+      error: err,
+      correlationId,
+    });
+    send500(res, { message }, err);
+    next();
+  }
+}
+
+export async function sendPasswordToken(req: Request, res: Response, next: NextFunction) {
+  const correlationId = res.get("x-correlation-id") || "";
+  try {
+    const { email } = req.body;
+    const user = await getRepository(User).findOne({ email });
+    if (!user) {
+      send404(res, { message: "User not found" });
+      return next();
+    }
+
+    const { token, expires } = createToken();
+    const passwordToken: ActivationToken = {
+      token,
+      expires,
+      user,
+    };
+    user.activationTokens?.push(passwordToken);
+    sendPasswordResetTokenEmail(user.email, token, expires, correlationId);
+    res.status(200).json({
+      message: "Forgotten password token sent.",
+    });
+    next();
+  } catch (err) {
+    const message = "Unexpected error when getting token to reset password";
+    logger.error({
+      message,
+      data: req.body,
       error: err,
       correlationId,
     });

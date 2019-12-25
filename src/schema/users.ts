@@ -21,6 +21,10 @@ export const editSchema = yup.object().shape({
   email: yup.string().email().required(),
 });
 
+export const sendPasswordTokenSchema = yup.object().shape({
+  email: yup.string().email().required(),
+});
+
 const getOneSchema = yup.object().shape({ id: yup.number().required() });
 
 export type ISignupRequest = yup.InferType<typeof signupSchema>;
