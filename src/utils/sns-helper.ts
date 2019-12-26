@@ -1,7 +1,7 @@
 import { SNS } from "aws-sdk";
 import logger from "logger";
 
-export async function publishToSNS(topicARN: string, message: object, correlationId: string) {
+export async function publishToSNS(topicARN: string, message: ISNSMessage, correlationId: string) {
   const region = process.env.SNS_REGION;
   const endpoint = process.env.SNS_ENDPOINT;
 
@@ -44,4 +44,10 @@ export async function publishToSNS(topicARN: string, message: object, correlatio
       error: error.toString(),
     });
   }
+}
+
+export interface ISNSMessage {
+  type: string;
+  data: object;
+  correlationId: string;
 }
