@@ -20,19 +20,19 @@ export function createToken(): { token: string; expires: Date } {
 }
 
 export async function sendActivationTokenEmail(user: User, token: string, expires: Date, correlationId: string) {
-  const message = { emailType: "ACTIVATION_TOKEN", data: { user: getEmailUser(user), token, expires: expires.toUTCString() } }
+  const message = { type: "ACTIVATE_ACCOUNT", data: { user: getEmailUser(user), token, expires: expires.toUTCString() }, correlationId }
   const topicArn = process.env.EMAIL_SNS_TOPIC_ARN || "";
   await publishToSNS(topicArn, message, correlationId);
 }
 
 export async function sendPasswordResetTokenEmail(user: User, token: string, expires: Date, correlationId: string) {
-  const message = { emailType: "PASSWORD_RESET_TOKEN", data: { user: getEmailUser(user), token, expires: expires.toUTCString() } }
+  const message = { type: "PASSWORD_RESET_TOKEN", data: { user: getEmailUser(user), token, expires: expires.toUTCString() }, correlationId }
   const topicArn = process.env.EMAIL_SNS_TOPIC_ARN || "";
   await publishToSNS(topicArn, message, correlationId);
 }
 
 function getEmailUser(user: User) {
-  const result = {...user};
+  const result = { ...user };
   result.password = "";
   return result;
 }
