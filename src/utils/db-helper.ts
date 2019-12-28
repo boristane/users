@@ -22,7 +22,7 @@ export async function createConnectionToDB(): Promise<Connection> {
       message: "Unable to connect to database",
       data: connectionOptions,
       correlationId: "",
-      error: err.toString(),
+      error: err,
     });
     process.exit(1);
   }

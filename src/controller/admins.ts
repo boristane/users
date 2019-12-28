@@ -6,6 +6,7 @@ import { sign } from "jsonwebtoken";
 import { send404, send500, send401, send409 } from "../utils/http-error-responses";
 import { ILoginRequest } from "../schema/users";
 import logger from "logger";
+import { getTokenPayload } from "../auth/auth";
 
 export async function getAll(req: Request, res: Response, next: NextFunction) {
   const correlationId = res.get("x-correlation-id") || "";
@@ -123,7 +124,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       send401(res, { message: "Unauthorised operation" });
       return next();
     }
-    const token = sign(admin.email, process.env.JWT_ADMINS_KEY || "");
+    const tokenPayload = getTokenPayload(admin);
+    const token = sign(tokenPayload, process.env.JWT_ADMINS_KEY || "");
 
     res.locals.body = { id: admin.id, token }
     res.status(200).json({

@@ -9,6 +9,7 @@ import { ISignupRequest, ILoginRequest, IEditRequest } from "../schema/users";
 import { createToken, sendActivationTokenEmail, sendPasswordResetTokenEmail } from "../utils/activation-tokens";
 import logger from "logger";
 import moment from "moment";
+import { getTokenPayload } from "../auth/auth";
 
 export async function getAll(req: Request, res: Response, next: NextFunction) {
   const correlationId = res.get("x-correlation-id") || "";
@@ -134,7 +135,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       send401(res, { message: "Sorry that didn't work, please try again." });
       return next();
     }
-    const token = sign(user.email, process.env.JWT_USERS_KEY || "");
+    const tokenPayload = getTokenPayload(user);
+    const token = sign(tokenPayload, process.env.JWT_USERS_KEY || "");
 
     res.locals.body = { id: user.id, token }
     res.status(200).json({
