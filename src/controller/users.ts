@@ -124,14 +124,14 @@ export async function login(req: Request, res: Response, next: NextFunction) {
   try {
     const [user,] = await getRepository(User).find({ email });
     if (!user) {
-      send401(res, { message: "Unauthorised operation" });
+      send401(res, { message: "Sorry that didn't work, please try again." });
       return next();
     }
 
     const passwordCompare = await compare(password, user.password);
 
     if (!passwordCompare) {
-      send401(res, { message: "Unauthorised operation" });
+      send401(res, { message: "Sorry that didn't work, please try again." });
       return next();
     }
     const token = sign(user.email, process.env.JWT_USERS_KEY || "");

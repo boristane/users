@@ -41,7 +41,7 @@ export async function publishToSNS(topicARN: string, message: ISNSMessage, corre
         message,
       },
       correlationId,
-      error: error.toString(),
+      error,
     });
   }
 }

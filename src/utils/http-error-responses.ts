@@ -16,31 +16,43 @@ export interface IHTTPError {
 }
 
 export function send401(res: Response, error: IHTTPError) {
-  res.status(401).json(Object.assign(error, { code: httpErrors.unauthorized }));
+  const response = Object.assign(error, { code: httpErrors.unauthorized });
+  res.locals.body = response;
+  res.status(401).json(response);
 }
 
 export function send403(res: Response, error: IHTTPError) {
-  res.status(403).json(Object.assign(error, { code: httpErrors.forbidden }));
+  const response = Object.assign(error, { code: httpErrors.forbidden });
+  res.locals.body = response;
+  res.status(403).json(response);
 }
 
 export function send404(res: Response, error: IHTTPError) {
-  res.status(404).json(Object.assign(error, { code: httpErrors.noneFound }));
+  const response = Object.assign(error, { code: httpErrors.noneFound });
+  res.locals.body = response;
+  res.status(404).json(response);
 }
 
 export function send409(res: Response, error: IHTTPError) {
-  res.status(409).json(Object.assign(error, { code: httpErrors.alreadyCreated }));
+  const response = Object.assign(error, { code: httpErrors.alreadyCreated });
+  res.locals.body = response;
+  res.status(409).json(response);
 }
 
 export function send410(res: Response, error: IHTTPError) {
-  res.status(410).json(Object.assign(error, { code: httpErrors.gone }));
+  const response = Object.assign(error, { code: httpErrors.gone });
+  res.locals.body = response;
+  res.status(410).json(response);
 }
 
 export function send500(res: Response, error: IHTTPError, err?: any) {
-  res.locals.body = err;
-  res.status(500).json(Object.assign(error, { code: httpErrors.internalServerError }));
+  const response = Object.assign(error, { code: httpErrors.internalServerError }, err);
+  res.locals.body = response;
+  res.status(500).json(response);
 }
 
 export function send400(res: Response, error: IHTTPError, err?: any) {
-  res.locals.body = err;
-  res.status(400).json(Object.assign(error, { code: httpErrors.badRequest }));
+  const response = Object.assign(error, { code: httpErrors.badRequest }, err);
+  res.locals.body = response;
+  res.status(400).json(response);
 }
