@@ -13,4 +13,4 @@ describe("Activation token generation", () => {
     const now = new Date();
     expect(result.expires.getHours()).toEqual(now.getHours() + 2);
   });
-})
+});
