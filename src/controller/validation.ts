@@ -18,7 +18,7 @@ export async function validateRequest(req: Request, res: Response, next: NextFun
     if (validated) { return next(); }
 
     logger.error({
-      message: `Unknown request`,
+      message: "Unknown request",
       data: {
         body: req.body,
         query: req.query,
@@ -28,6 +28,7 @@ export async function validateRequest(req: Request, res: Response, next: NextFun
       },
       correlationId,
     });
+    send400(res, { message: "Unknown request" });
     return next();
   } catch (err) {
     logger.error({
@@ -42,6 +43,7 @@ export async function validateRequest(req: Request, res: Response, next: NextFun
       correlationId,
     });
     send400(res, { message: "Bad request, does not match schema", target: err.errors }, err);
+    return next();
   }
 }
 
