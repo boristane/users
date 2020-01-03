@@ -9,14 +9,16 @@ import {
   edit,
   sendPasswordToken,
   checkPasswordToken,
-  resetPassword
+  resetPassword,
+  getMe
 } from "../controller/users";
 import { userAuth, adminAuth } from "../auth/auth";
 
 const router = express.Router();
 
 router.get("/", adminAuth, getAll);
-router.get("/:id", userAuth, getOne);
+router.get("/me", userAuth, getMe);
+router.get("/:id", adminAuth, getOne);
 router.get("/activate/:token", activate);
 router.post("/password-token", sendPasswordToken);
 router.get("/password-token/:token", checkPasswordToken);

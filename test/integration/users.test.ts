@@ -46,7 +46,7 @@ describe("users listing", () => {
 
   it("should return 404 on user not found", async () => {
     const id = 50;
-    const token = sign(users[0].email, process.env.JWT_USERS_KEY || "");
+    const token = sign(users[0].email, process.env.JWT_ADMINS_KEY || "");
     const response = await request(app).get(`/users/${id}`).set("Authorization", `Bearer ${token}`);
 
     expect(response.status).toBe(404);
@@ -60,8 +60,23 @@ describe("users listing", () => {
 
   it("should return the correct valid user", async () => {
     const id = 1;
-    const token = sign(users[0].email, process.env.JWT_USERS_KEY || "");
+    const token = sign(users[0].email, process.env.JWT_ADMINS_KEY || "");
     const response = await request(app).get(`/users/${id}`).set("Authorization", `Bearer ${token}`);
+    expect(response.status).toBe(200);
+    expect(response.body.user.email).toEqual(users[0].email);
+  }); 
+});
+
+describe("Finding myself", () =>{
+  it("should fail if you're not logged in", async () => {
+    const id = 1;
+    const response = await request(app).get(`/users/${id}`);
+    expect(response.status).toBe(401);
+  });
+
+  it("should return the correct valid user", async () => {
+    const token = sign(users[0], process.env.JWT_USERS_KEY || "");
+    const response = await request(app).get(`/users/me`).set("Authorization", `Bearer ${token}`);
     expect(response.status).toBe(200);
     expect(response.body.user.email).toEqual(users[0].email);
   });
@@ -295,7 +310,7 @@ describe("Get forgotten password token", () => {
   });
 });
 
-describe("Check forgottem password token", () => {
+describe("Check forgotten password token", () => {
   it("should respond with 200 on a valid token", async () => {
     const token = tokens[0];
     const response = await request(app).get(`/users/password-token/${token.token}`);

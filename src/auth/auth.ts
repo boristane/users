@@ -11,7 +11,7 @@ export function userAuth(req: Request, res: Response, next: NextFunction) {
       throw new Error("No token found in the headers");
     }
     const decoded = verify(token, "USER");
-    Object.assign(req, { userData: decoded });
+    res.locals.userData = decoded;
     next();
   } catch (error) {
     send401(res, { message: "Unauthorized operation" });
