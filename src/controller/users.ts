@@ -1,4 +1,4 @@
-import { getRepository, getConnection } from "typeorm";
+import { getRepository } from "typeorm";
 import { User } from "../entity/User";
 import { Request, Response, NextFunction } from "express";
 import { hash, compare } from "bcryptjs";
@@ -8,7 +8,6 @@ import { send404, send409, send500, send401, send410 } from "../utils/http-error
 import { ISignupRequest, ILoginRequest, IEditRequest } from "../schema/users";
 import { createToken, sendActivationTokenEmail, sendPasswordResetTokenEmail } from "../utils/activation-tokens";
 import logger from "logger";
-import moment from "moment";
 import { getTokenPayload } from "../auth/auth";
 
 export async function getAll(req: Request, res: Response, next: NextFunction) {
@@ -119,6 +118,49 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+export async function getMe(req: Request, res: Response, next: NextFunction) {
+  const correlationId = res.get("x-correlation-id") || "";
+  try {
+    const { userData } = res.locals;
+    if (!userData) {
+      send401(res, { message: "Unauthorised operation" });
+      return next();
+    }
+
+    const user = await getRepository(User).findOneOrFail({ email: userData.email })
+    const response = {
+      message: "User found.",
+      user: {
+        id: user.id,
+        forename: user.forename,
+        surname: user.surname,
+        email: user.email,
+        phone: user.phone,
+        created: user.created,
+        updated: user.updated
+      },
+      request: {
+        type: "GET",
+        url: `/users/`
+      }
+    };
+
+    res.locals.body = response;
+    res.status(200).json(response);
+    next();
+  } catch (err) {
+    const message = "Error getting use (me)";
+    logger.error({
+      message,
+      data: req.body,
+      error: err,
+      correlationId,
+    });
+    send500(res, { message }, err);
+    next();
+  }
+}
+
 export async function login(req: Request, res: Response, next: NextFunction) {
   const correlationId = res.get("x-correlation-id") || "";
   const { email, password }: ILoginRequest = req.body;
@@ -192,7 +234,7 @@ export async function getOne(req: Request, res: Response, next: NextFunction) {
     const message = "Error getting user";
     logger.error({
       message,
-      data: req.body,
+      data: req.params,
       error: err,
       correlationId,
     });
