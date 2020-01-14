@@ -26,6 +26,7 @@ function requestLogger(
         body: req.body,
         query: req.query,
         method: req.method,
+        token: req.headers.authorization,
       },
       correlationId,
     });
