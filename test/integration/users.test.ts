@@ -69,14 +69,13 @@ describe("users listing", () => {
 
 describe("Finding myself", () =>{
   it("should fail if you're not logged in", async () => {
-    const id = 1;
-    const response = await request(app).get(`/users/${id}`);
+    const response = await request(app).get(`/users/me/all`);
     expect(response.status).toBe(401);
   });
 
   it("should return the correct valid user", async () => {
     const token = sign(users[0], process.env.JWT_USERS_KEY || "");
-    const response = await request(app).get(`/users/me`).set("Authorization", `Bearer ${token}`);
+    const response = await request(app).get(`/users/me/all`).set("Authorization", `Bearer ${token}`);
     expect(response.status).toBe(200);
     expect(response.body.user.email).toEqual(users[0].email);
   });

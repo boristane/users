@@ -24,7 +24,7 @@ export async function validateRequest(req: Request, res: Response, next: NextFun
         query: req.query,
         method: req.method,
         path,
-        baseUrl
+        baseUrl,
       },
       correlationId,
     });
