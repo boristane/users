@@ -3,6 +3,7 @@ import logger from "logger";
 import { send400 } from "../utils/http-error-responses";
 import { signupSchema, loginSchema, editSchema, sendPasswordTokenSchema } from "../schema/users";
 import { createSchema, deleteSchema } from "../schema/admin";
+import { apiServiceUpdateSchema, apiServiceCreateSchema } from "../schema/apiService";
 
 export async function validateRequest(req: Request, res: Response, next: NextFunction) {
   const correlationId = res.get("x-correlation-id") || "";
@@ -14,6 +15,8 @@ export async function validateRequest(req: Request, res: Response, next: NextFun
       validated = await validateUserRequest(req);
     } else if (`/${baseUrl}` === "/admins") {
       validated = await validateAdminRequest(req);
+    } else if (`/${baseUrl}` === "/api-services") {
+      validated = await validateApiServiceRequest(req);
     }
     if (validated) { return next(); }
 
@@ -103,6 +106,32 @@ async function validateAdminRequest(req: Request): Promise<boolean> {
       await loginSchema.validate(req.body);
       return true;
     }
+  }
+  return false;
+}
+
+async function validateApiServiceRequest(req: Request): Promise<boolean> {
+  const { method } = req;
+  if (method === "DELETE") {
+    const id = getfirstParam(req.path);
+    if (!Number(id)) {
+      throw new Error();
+    }
+    return true;
+  }
+
+  if (method === "POST") {
+    await apiServiceCreateSchema.validate(req.body);
+    return true;
+  }
+
+  if (method === "PATCH") {
+    await apiServiceUpdateSchema.validate(req.body);
+    const id = getfirstParam(req.path);
+    if (!Number(id)) {
+      throw new Error();
+    }
+    return true;
   }
   return false;
 }

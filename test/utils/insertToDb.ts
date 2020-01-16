@@ -4,6 +4,7 @@ import { User } from "../../src/entity/User";
 import { ActivationToken } from "../../src/entity/ActivationToken";
 import moment = require("moment");
 import { Admin } from "../../src/entity/Admin";
+import { APIService } from "../../src/entity/APIService";
 
 export function insertUsers(users: Array<ITestUser>) {
   const promises = users.map(async (user, index) => {
@@ -35,15 +36,15 @@ export async function insertActivationTokens(tokens: ITestActivationToken[]) {
       token: token.token,
       user,
       expires: token.expires ? new Date(token.expires) : moment().add(2, "days").toDate(),
-      used: token.used
+      isUsed: token.used
     };
     return await getRepository(ActivationToken).insert(newToken);
   });
   return Promise.all(promises);
 }
 
-export async function insertAdmins(tokens: ITestAdmin[]) {
-  const promises = tokens.map(async (admin, index) => {
+export async function insertAdmins(admins: ITestAdmin[]) {
+  const promises = admins.map(async (admin, index) => {
     const hashedPassword = await hash(admin.password, 10);
     const newAdmin: Admin = {
       id: index + 1,
@@ -53,6 +54,20 @@ export async function insertAdmins(tokens: ITestAdmin[]) {
       isSuperAdmin: admin.isSuperAdmin
     };
     return await getRepository(Admin).insert(newAdmin);
+  });
+  return Promise.all(promises);
+}
+
+export async function insertApiServices(apiServices: ITestApiService[]) {
+  const promises = apiServices.map(async (service, index) => {
+    const newService: APIService = {
+      id: index + 1,
+      name: service.name,
+      token: service.token,
+      isActive: service.active,
+      expires: moment(service.expires).toDate(),
+    };
+    return await getRepository(APIService).insert(newService);
   });
   return Promise.all(promises);
 }
@@ -77,4 +92,11 @@ export interface ITestAdmin {
   password: string;
   email: string;
   isSuperAdmin: boolean;
+}
+
+export interface ITestApiService {
+  name: string;
+  token: string;
+  active: boolean;
+  expires: string;
 }

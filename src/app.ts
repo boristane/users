@@ -3,6 +3,7 @@ import logger from "logger";
 import uuid from "uuid/v4";
 import usersRouter from "./router/users";
 import adminsRouter from "./router/admins";
+import apiServicesRouter from "./router/apiServices";
 import { validateRequest } from "./controller/validation";
 
 const suppressLoggingPaths = ["/"];
@@ -61,4 +62,5 @@ app.use(requestLogger);
 app.use(validateRequest);
 app.use("/users/", usersRouter);
 app.use("/admins/", adminsRouter);
+app.use("/api-services/", apiServicesRouter);
 app.use(responseLogger);

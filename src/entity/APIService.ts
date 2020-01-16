@@ -20,11 +20,11 @@ export class APIService {
   @Column({ type: "timestamp" })
   expires!: Date;
 
-  @Column({ default: false })
-  active!: boolean;
+  @Column({ default: true })
+  isActive!: boolean;
 
-  @Column({ type: "timestamp" })
-  lastUsed!: Date;
+  @Column({ type: "timestamp", nullable: true })
+  lastUsed?: Date;
 
   @CreateDateColumn()
   created?: Date;
