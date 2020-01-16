@@ -25,7 +25,7 @@ export class ActivationToken {
   expires!: Date;
 
   @Column( {default: false} )
-  used!: boolean;
+  isUsed!: boolean;
 
   @CreateDateColumn()
   created?: Date;

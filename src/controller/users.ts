@@ -17,11 +17,6 @@ export async function getAll(req: Request, res: Response, next: NextFunction) {
     const userRepository = getRepository(User);
     const users = await userRepository.createQueryBuilder("user").getMany();
 
-    if (users.length === 0) {
-      send404(res, { message: "No User found with in the database" });
-      return next();
-    }
-
     const response = {
       count: users.length,
       users: users.map((doc) => {
@@ -86,7 +81,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
       token,
       expires,
       user: newUser,
-      used: false,
+      isUsed: false,
     };
     newUser.activationTokens = [activationToken];
 
@@ -339,7 +334,7 @@ export async function activate(req: Request, res: Response, next: NextFunction) 
       send410(res, { message: "Activation token expired" });
       return next();
     }
-    if (t.used) {
+    if (t.isUsed) {
       send410(res, { message: "Activation token already used" });
       return next();
     }
@@ -347,7 +342,7 @@ export async function activate(req: Request, res: Response, next: NextFunction) 
     const user = t.user;
 
     user.activated = true;
-    t.used = true;
+    t.isUsed = true;
     await getRepository(ActivationToken).save(t);
     await getRepository(User).save(user);
 
@@ -389,7 +384,7 @@ export async function sendPasswordToken(req: Request, res: Response, next: NextF
       token,
       expires,
       user,
-      used: false,
+      isUsed: false,
     };
     user.activationTokens?.push(passwordToken);
     sendPasswordResetTokenEmail(user, token, expires, correlationId);
@@ -424,7 +419,7 @@ export async function checkPasswordToken(req: Request, res: Response, next: Next
       send410(res, { message: "Activation token expired" });
       return next();
     }
-    if (t.used) {
+    if (t.isUsed) {
       send410(res, { message: "Activation token already used" });
       return next();
     }
@@ -460,12 +455,12 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
       send410(res, { message: "Activation token expired" });
       return next();
     }
-    if (t.used) {
+    if (t.isUsed) {
       send410(res, { message: "Activation token already used" });
       return next();
     }
 
-    t.used = true;
+    t.isUsed = true;
     await getRepository(ActivationToken).save(t);
     const saltRounds = 10;
     const hashedPassword = await hash(password, saltRounds);
