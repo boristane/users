@@ -54,16 +54,11 @@ export function verify(token: string, type: string) {
 export function getTokenPayload(user: User | Admin) {
   if (user instanceof User) {
     return {
-      email: user.email,
-      forename: user.forename,
-      surname: user.surname,
-      id: user.id,
+      uuid: user.uuid,
     };
   }
   if (user instanceof Admin) {
     return {
-      email: user.email,
-      username: user.username,
       id: user.id,
     };
   }

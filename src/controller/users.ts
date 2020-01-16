@@ -9,6 +9,7 @@ import { ISignupRequest, ILoginRequest, IEditRequest } from "../schema/users";
 import { createToken, sendActivationTokenEmail, sendPasswordResetTokenEmail } from "../utils/activation-tokens";
 import logger from "logger";
 import { getTokenPayload } from "../auth/auth";
+import uuid from "uuid/v4";
 
 export async function getAll(req: Request, res: Response, next: NextFunction) {
   const correlationId = res.get("x-correlation-id") || "";
@@ -70,6 +71,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
     const saltRounds = 10;
     const hashedPassword = await hash(password, saltRounds);
     const newUser: User = {
+      uuid: uuid(),
       forename,
       surname,
       email,

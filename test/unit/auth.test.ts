@@ -1,6 +1,4 @@
 import { User } from "../../src/entity/User";
-import users from "../data/users.json";
-import admins from "../data/admins.json";
 import { getTokenPayload, verify, adminAuth } from "../../src/auth/auth";
 import { sign } from "jsonwebtoken";
 import { Admin } from "../../src/entity/Admin";
@@ -9,28 +7,18 @@ require("dotenv").config();
 
 it("should return the correct payload for the authentication token for users", () => {
   const user = new User();
-  user.surname = "Surname";
-  user.forename = "Forename";
-  user.id = 1;
-  user.email = "email@email.email";
+  user.uuid = "1111-1111-1111-1111";
   const payload = getTokenPayload(user);
   expect(payload).toEqual({
-    surname: user.surname,
-    forename: user.forename,
-    email: user.email,
-    id: user.id,
+    uuid: user.uuid,
   });
 });
 
 it("should return the correct payload for the authentication token for admins", () => {
   const admin = new Admin();
-  admin.username = "Username";
   admin.id = 1;
-  admin.email = "email@email.email";
   const payload = getTokenPayload(admin);
   expect(payload).toEqual({
-    username: admin.username,
-    email: admin.email,
     id: admin.id,
   });
 });
