@@ -3,6 +3,8 @@ import { Request, Response, NextFunction } from "express";
 import { send401 } from "../utils/http-error-responses";
 import { User } from "../entity/User";
 import { Admin } from "../entity/Admin";
+import { getRepository } from "typeorm";
+import { APIService } from "../entity/APIService";
 
 export function userAuth(req: Request, res: Response, next: NextFunction) {
   try {
@@ -26,6 +28,22 @@ export function adminAuth(req: Request, res: Response, next: NextFunction) {
     }
     const decoded = verify(token, "ADMIN");
     Object.assign(req, { userData: decoded });
+    next();
+  } catch (error) {
+    send401(res, { message: "Unauthorized operation" });
+  }
+}
+
+export async function apiAuth(req: Request, res: Response, next: NextFunction) {
+  try {
+    const token = req.get("X-TOKEN-AUTH") || "";
+    if (!token) {
+      throw new Error("No token found in the headers");
+    }
+    const api = await getRepository(APIService).findOneOrFail({token});
+    api.lastUsed = new Date();
+    await getRepository(APIService).save(api);
+    Object.assign(req, { api });
     next();
   } catch (error) {
     send401(res, { message: "Unauthorized operation" });

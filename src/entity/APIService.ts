@@ -2,30 +2,29 @@ import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
-  ManyToOne,
   CreateDateColumn,
   UpdateDateColumn
 } from "typeorm";
-import { User } from "./User";
 
 @Entity()
-export class ActivationToken {
+export class APIService {
   @PrimaryGeneratedColumn()
   id?: number;
 
   @Column({ unique: true })
-  token!: string;
+  name!: string;
 
-  @ManyToOne(type => User, user => user.activationTokens, {
-    onDelete: "CASCADE"
-  })
-  user!: User;
+  @Column({ unique: true })
+  token!: string;
 
   @Column({ type: "timestamp" })
   expires!: Date;
 
-  @Column( {default: false} )
-  used!: boolean;
+  @Column({ default: false })
+  active!: boolean;
+
+  @Column({ type: "timestamp" })
+  lastUsed!: Date;
 
   @CreateDateColumn()
   created?: Date;
