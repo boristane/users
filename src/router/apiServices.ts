@@ -1,17 +1,14 @@
 import express from "express";
 import {
   getAll,
-  del,
-  edit,
+  update,
   create,
 } from "../controller/apiServices";
-import { adminAuth } from "../auth/auth";
 
 const router = express.Router();
 
-router.get("/", adminAuth, getAll);
-router.post("/", adminAuth, create);
-router.patch("/:id", adminAuth, edit);
-router.delete("/:id", adminAuth, del);
+router.get("/", getAll);
+router.post("/", create);
+router.patch("/:id", update);
 
 export default router;

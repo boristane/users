@@ -5,6 +5,7 @@ import usersRouter from "./router/users";
 import adminsRouter from "./router/admins";
 import apiServicesRouter from "./router/apiServices";
 import { validateRequest } from "./controller/validation";
+import { adminAuth } from "./auth/auth";
 
 const suppressLoggingPaths = ["/"];
 const ommitedInLogs = [
@@ -62,5 +63,5 @@ app.use(requestLogger);
 app.use(validateRequest);
 app.use("/users/", usersRouter);
 app.use("/admins/", adminsRouter);
-app.use("/api-services/", apiServicesRouter);
+app.use("/api-services/", adminAuth, apiServicesRouter);
 app.use(responseLogger);

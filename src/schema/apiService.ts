@@ -2,13 +2,11 @@ import * as yup from "yup";
 
 export const apiServiceCreateSchema = yup.object().shape({
   name: yup.string().required(),
-  expires: yup.date().required(),
+  expires: yup.string().required(),
 });
 
 export const apiServiceUpdateSchema = yup.object().shape({
-  name: yup.string().notRequired(),
-  expires: yup.date().notRequired(),
-  active: yup.boolean().notRequired(),
+  active: yup.boolean().required(),
 });
 
 

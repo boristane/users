@@ -21,7 +21,7 @@ export class APIService {
   expires!: Date;
 
   @Column({ default: true })
-  isActive!: boolean;
+  isActive?: boolean;
 
   @Column({ type: "timestamp", nullable: true })
   lastUsed?: Date;
