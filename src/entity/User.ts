@@ -28,6 +28,9 @@ export class User {
   @Column({ unique: true, nullable: false })
   email!: string;
 
+  @Column({ unique: true, nullable: false })
+  uuid!: string;
+
   @CreateDateColumn()
   created?: Date;
 

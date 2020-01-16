@@ -11,6 +11,7 @@ export function insertUsers(users: Array<ITestUser>) {
     const hashedPassword = await hash(user.password, saltRounds);
     const newUser: User = {
       id: index + 1,
+      uuid: `${index + 1}`,
       surname: user.surname,
       forename: user.forename,
       phone: user.phone,
