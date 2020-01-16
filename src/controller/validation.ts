@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import logger from "logger";
 import { send400 } from "../utils/http-error-responses";
-import { signupSchema, loginSchema, editSchema, sendPasswordTokenSchema } from "../schema/users";
-import { createSchema, deleteSchema } from "../schema/admin";
-import { apiServiceUpdateSchema, apiServiceCreateSchema } from "../schema/apiService";
+import { validateUserRequest } from "./validation/users";
+import { validateAdminRequest } from "./validation/admins";
+import { validateApiServiceRequest } from "./validation/apiService";
 
 export async function validateRequest(req: Request, res: Response, next: NextFunction) {
   const correlationId = res.get("x-correlation-id") || "";
@@ -31,7 +31,6 @@ export async function validateRequest(req: Request, res: Response, next: NextFun
       },
       correlationId,
     });
-    // send400(res, { message: "Unknown request" });
     return next();
   } catch (err) {
     logger.error({
@@ -46,101 +45,11 @@ export async function validateRequest(req: Request, res: Response, next: NextFun
       correlationId,
     });
     send400(res, { message: "Bad request, does not match schema", target: err.errors }, err);
-    // return next();
   }
 }
 
-async function validateUserRequest(req: Request): Promise<boolean> {
-  const { method } = req;
-  if (method === "DELETE") {
-    const id = getfirstParam(req.path);
-    if (!Number(id)) {
-      throw new Error();
-    }
-    return true;
-  }
 
-  if (method === "POST") {
-    if (req.path === "/users/signup") {
-      await signupSchema.validate(req.body);
-      return true;
-    }
-    if (req.path === "/users/login") {
-      await loginSchema.validate(req.body);
-      return true;
-    }
-    if (req.path === "/users/password-token") {
-      await sendPasswordTokenSchema.validate(req.body);
-      return true;
-    }
-  }
 
-  if (method === "PATCH") {
-    await editSchema.validate(req.body);
-    const id = getfirstParam(req.path);
-    if (!Number(id)) {
-      throw new Error();
-    }
-    return true;
-  }
-  if (method === "GET") return true;
-  return false;
-}
 
-async function validateAdminRequest(req: Request): Promise<boolean> {
-  const { method } = req;
-  if (method === "DELETE") {
-    const id = getfirstParam(req.path);
-    if (!Number(id)) {
-      throw new Error();
-    }
-    await deleteSchema.validate(req.body);
-    return true;
-  }
 
-  if (method === "POST") {
-    if (req.path === "/admins") {
-      await createSchema.validate(req.body);
-      return true;
-    }
-    if (req.path === "/admins/login") {
-      await loginSchema.validate(req.body);
-      return true;
-    }
-  }
-  if (method === "GET") return true;
-  return false;
-}
 
-async function validateApiServiceRequest(req: Request): Promise<boolean> {
-  const { method } = req;
-  if (method === "DELETE") {
-    const id = getfirstParam(req.path);
-    if (!Number(id)) {
-      throw new Error();
-    }
-    return true;
-  }
-
-  if (method === "POST") {
-    await apiServiceCreateSchema.validate(req.body);
-    return true;
-  }
-
-  if (method === "PATCH") {
-    await apiServiceUpdateSchema.validate(req.body);
-    const id = getfirstParam(req.path);
-    if (!Number(id)) {
-      throw new Error();
-    }
-    return true;
-  }
-
-  if (method === "GET") return true;
-  return false;
-}
-
-function getfirstParam(path: string): string {
-  const [, , id] = path.split("/");
-  return id;
-}
