@@ -27,7 +27,7 @@ export function adminAuth(req: Request, res: Response, next: NextFunction) {
       throw new Error("No token found in the headers");
     }
     const decoded = verify(token, "ADMIN");
-    Object.assign(req, { userData: decoded });
+    res.locals.userData = decoded;
     next();
   } catch (error) {
     send401(res, { message: "Unauthorized operation" });
@@ -43,7 +43,7 @@ export async function apiAuth(req: Request, res: Response, next: NextFunction) {
     const api = await getRepository(APIService).findOneOrFail({token});
     api.lastUsed = new Date();
     await getRepository(APIService).save(api);
-    Object.assign(req, { api });
+    res.locals.apiData = api;
     next();
   } catch (error) {
     send401(res, { message: "Unauthorized operation" });
