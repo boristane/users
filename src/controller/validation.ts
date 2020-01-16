@@ -4,6 +4,7 @@ import { send400 } from "../utils/http-error-responses";
 import { validateUserRequest } from "./validation/users";
 import { validateAdminRequest } from "./validation/admins";
 import { validateApiServiceRequest } from "./validation/apiService";
+import { validateInternalRequest } from "./validation/internal";
 
 export async function validateRequest(req: Request, res: Response, next: NextFunction) {
   const correlationId = res.get("x-correlation-id") || "";
@@ -17,6 +18,8 @@ export async function validateRequest(req: Request, res: Response, next: NextFun
       validated = await validateAdminRequest(req);
     } else if (`/${baseUrl}` === "/api-services") {
       validated = await validateApiServiceRequest(req);
+    } else if (`/${baseUrl}` === "/internal") {
+      validated = await validateInternalRequest(req);
     }
     if (validated) { return next(); }
 

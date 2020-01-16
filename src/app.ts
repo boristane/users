@@ -4,8 +4,9 @@ import uuid from "uuid/v4";
 import usersRouter from "./router/users";
 import adminsRouter from "./router/admins";
 import apiServicesRouter from "./router/apiServices";
+import internalRouter from "./router/internal";
 import { validateRequest } from "./controller/validation";
-import { adminAuth } from "./auth/auth";
+import { adminAuth, apiAuth } from "./auth/auth";
 
 const suppressLoggingPaths = ["/"];
 const ommitedInLogs = [
@@ -64,4 +65,5 @@ app.use(validateRequest);
 app.use("/users/", usersRouter);
 app.use("/admins/", adminsRouter);
 app.use("/api-services/", adminAuth, apiServicesRouter);
+app.use("/internal/", apiAuth, internalRouter);
 app.use(responseLogger);

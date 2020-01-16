@@ -4,20 +4,23 @@
     "surname": "lol",
     "email": "brian@lol.com",
     "password": "password",
-    "phone": "011117845678"
+    "phone": "011117845678",
+    "uuid": "1111-1111-1111-1111"
   },
   {
     "forename": "jaden",
     "surname": "derek",
     "email": "ddb@ovos.com",
     "password": "gimslefablack",
-    "phone": "011117845678"
+    "phone": "011117845678",
+    "uuid": "2222-2222-2222-2222"
   },
   {
     "forename": "kanye",
     "surname": "west",
     "email": "kanye@west.com",
     "password": "houre1234567",
-    "phone": "011117845678"
+    "phone": "011117845678",
+    "uuid": "3333-3333-3333-3333"
   }
 ]

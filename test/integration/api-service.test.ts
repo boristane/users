@@ -1,7 +1,7 @@
 import { app } from "../../src/app";
 import request from "supertest";
 import { createConnectionToDB } from "../../src/utils/db-helper";
-import { insertAdmins, ITestAdmin } from "../utils/insertToDb";
+import { insertAdmins, ITestAdmin, ITestApiService, insertApiServices } from "../utils/insertToDb";
 import { removeAllFromDB } from "../utils/removeFromDb";
 import apiServices from "../data/api-services.json";
 import admins from "../data/admins.json";
@@ -24,6 +24,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   await removeAllFromDB();
   await insertAdmins(admins as ITestAdmin[]);
+  await insertApiServices(apiServices as ITestApiService[]);
 });
 
 describe("api services listing", () => {

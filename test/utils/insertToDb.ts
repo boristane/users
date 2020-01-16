@@ -12,7 +12,7 @@ export function insertUsers(users: Array<ITestUser>) {
     const hashedPassword = await hash(user.password, saltRounds);
     const newUser: User = {
       id: index + 1,
-      uuid: `${index + 1}`,
+      uuid: user.uuid,
       surname: user.surname,
       forename: user.forename,
       phone: user.phone,
@@ -78,6 +78,7 @@ export interface ITestUser {
   password: string;
   email: string;
   phone: string;
+  uuid: string;
 }
 
 export interface ITestActivationToken {
