@@ -17,9 +17,11 @@ it("should return the correct payload for the authentication token for users", (
 it("should return the correct payload for the authentication token for admins", () => {
   const admin = new Admin();
   admin.id = 1;
+  admin.email = "test@test.com"
   const payload = getTokenPayload(admin);
   expect(payload).toEqual({
     id: admin.id,
+    email: admin.email,
   });
 });
 

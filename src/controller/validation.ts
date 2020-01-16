@@ -83,6 +83,7 @@ async function validateUserRequest(req: Request): Promise<boolean> {
     }
     return true;
   }
+  if (method === "GET") return true;
   return false;
 }
 
@@ -107,6 +108,7 @@ async function validateAdminRequest(req: Request): Promise<boolean> {
       return true;
     }
   }
+  if (method === "GET") return true;
   return false;
 }
 
@@ -133,6 +135,8 @@ async function validateApiServiceRequest(req: Request): Promise<boolean> {
     }
     return true;
   }
+
+  if (method === "GET") return true;
   return false;
 }
 

@@ -78,6 +78,7 @@ export function getTokenPayload(user: User | Admin) {
   if (user instanceof Admin) {
     return {
       id: user.id,
+      email: user.email,
     };
   }
   return "";

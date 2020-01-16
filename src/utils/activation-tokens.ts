@@ -2,19 +2,12 @@ import { publishToSNS } from "./sns-helper";
 import { User } from "../entity/User";
 
 export function createToken(): { token: string; expires: Date } {
-  const chars =
-    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  let t = "";
-  for (let i = 16; i > 0; --i) {
-    t += chars[Math.round(Math.random() * (chars.length - 1))];
-  }
   const validForHours = 2;
   const expires = new Date();
   expires.setHours(expires.getHours() + validForHours);
-
   const token = {
     expires,
-    token: t
+    token: generateRandomAlphaNumString(16),
   };
   return token;
 }
@@ -35,4 +28,14 @@ function getEmailUser(user: User) {
   const result = { ...user };
   result.password = "";
   return result;
+}
+
+export function generateRandomAlphaNumString(length: number) {
+  const chars =
+    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let s = "";
+  for (let i = length; i > 0; --i) {
+    s += chars[Math.round(Math.random() * (chars.length - 1))];
+  }
+  return s;
 }
