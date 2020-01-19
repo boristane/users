@@ -76,7 +76,10 @@ describe("get user email", () => {
 
   it("should respond with 404 for non existing user", async () => {
     const token = services.find(s => s.name === "email-service")?.token;
-    const response = await request(app).get(`/internal/users/email/whatever`).set("X-TOKEN-AUTH", token || "");
+    if (!token) {
+      throw new Error("The test data should have at least one email service");
+    }
+    const response = await request(app).get(`/internal/users/email/whatever`).set("X-TOKEN-AUTH", token);
     expect(response.status).toBe(404);
   });
 
