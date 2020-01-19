@@ -7,14 +7,10 @@ import apiServicesRouter from "./router/apiServices";
 import internalRouter from "./router/internal";
 import { validateRequest } from "./controller/validation";
 import { adminAuth, apiAuth } from "./auth/auth";
+import { pingDB } from "./utils/db-helper";
+import { send500 } from "./utils/http-error-responses";
 
-const suppressLoggingPaths = ["/"];
-const ommitedInLogs = [
-  "forename",
-  "surname",
-  "email",
-  "password",
-];
+const suppressLoggingPaths = ["/", "/health"];
 function requestLogger(
   req: Request,
   res: Response,
@@ -57,6 +53,16 @@ function responseLogger(
   next();
 }
 
+async function healthCheck(req: Request, res: Response, next: NextFunction) {
+  const dbStatus = await pingDB();
+  if (!dbStatus) {
+    send500(res, {message: "There was a problem connecting to the Database"});
+    return next();
+  }
+  res.status(200).json({message: "All Good"});
+  return next();
+}
+
 export const app = express();
 
 app.use(express.json());
@@ -66,4 +72,5 @@ app.use("/users/", usersRouter);
 app.use("/admins/", adminsRouter);
 app.use("/api-services/", adminAuth, apiServicesRouter);
 app.use("/internal/", apiAuth, internalRouter);
+app.get("/health", healthCheck);
 app.use(responseLogger);

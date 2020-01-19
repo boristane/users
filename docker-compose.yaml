@@ -38,7 +38,7 @@ services:
       - DB_NAME=users
       - JWT_USERS_KEY=jwt-users-key
       - JWT_ADMINS_KEY=jwt-admins-key
-      - EMAIL_SNS_TOPIC_ARN=arn:aws:sns:us-west-1:000000000000:emails
+      - USERS_SNS_TOPIC_ARN=arn:aws:sns:us-west-1:000000000000:users
       - SNS_REGION=us-west-1
       - SNS_ENDPOINT='http://localhost:4575'
       - FORGOTTEN_PASSWORD_URL='http://google.com'
