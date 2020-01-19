@@ -124,7 +124,7 @@ export async function getMe(req: Request, res: Response, next: NextFunction) {
       return next();
     }
 
-    const user = await getRepository(User).findOneOrFail({ email: userData.email })
+    const user = await getRepository(User).findOneOrFail({ uuid: userData.uuid });
     const response = {
       message: "User found.",
       user: {
@@ -146,7 +146,7 @@ export async function getMe(req: Request, res: Response, next: NextFunction) {
     res.status(200).json(response);
     next();
   } catch (err) {
-    const message = "Error getting use (me)";
+    const message = "Error getting user (me)";
     logger.error({
       message,
       data: req.body,
