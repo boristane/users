@@ -74,7 +74,7 @@ describe("Finding myself", () =>{
   });
 
   it("should return the correct valid user", async () => {
-    const token = sign(users[0], process.env.JWT_USERS_KEY || "");
+    const token = sign(users[0].uuid, process.env.JWT_USERS_KEY || "");
     const response = await request(app).get(`/users/me/all`).set("Authorization", `Bearer ${token}`);
     expect(response.status).toBe(200);
     expect(response.body.user.email).toEqual(users[0].email);
