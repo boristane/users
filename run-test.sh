@@ -16,8 +16,8 @@ docker-compose up -d
 #   sleep 2
 # done
 
-# SNS Topic for emails
-aws sns create-topic --name emails --endpoint-url 'http://localhost:4575' --region us-west-1
+# SNS Topic
+aws sns create-topic --name users --endpoint-url 'http://localhost:4575' --region us-west-1
 
 docker exec -t mysql mysql -h 127.0.0.1 -u root -ppassword -e "create database users" || true
 docker exec -t users npx ts-node ./test/setupDb.ts

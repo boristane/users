@@ -1,4 +1,4 @@
-import { createConnection, Connection, ConnectionOptions } from "typeorm";
+import { createConnection, Connection, ConnectionOptions, getConnection } from "typeorm";
 import { ActivationToken } from "../entity/ActivationToken";
 import { User } from "../entity/User";
 import logger from "logger";
@@ -26,5 +26,20 @@ export async function createConnectionToDB(): Promise<Connection> {
       error: err,
     });
     process.exit(1);
+  }
+}
+
+export async function pingDB(): Promise<boolean> {
+  try {
+    await getConnection().query("SELECT 1");
+    return true;
+  } catch (error) {
+    logger.error({
+      message: "There was a problem pinging the database",
+      error,
+      data: {},
+      correlationId: "",
+    });
+    return false;
   }
 }
