@@ -62,3 +62,50 @@ describe("get user", () => {
     expect(response.status).toBe(401);
   });
 });
+
+describe("get user email", () => {
+  it("should get an existing user email", async () => {
+    const token = services.find(s => s.name === "email-service")?.token;
+    if (!token) {
+      throw new Error("The test data should have at least one email service");
+    }
+    const response = await request(app).get(`/internal/users/email/${users[0].uuid}`).set("X-TOKEN-AUTH", token);
+    expect(response.status).toBe(200);
+    expect(response.body.user).toEqual({email: users[0].email});
+  });
+
+  it("should respond with 404 for non existing user", async () => {
+    const token = services.find(s => s.name === "email-service")?.token;
+    const response = await request(app).get(`/internal/users/email/whatever`).set("X-TOKEN-AUTH", token || "");
+    expect(response.status).toBe(404);
+  });
+
+  it("should 401 for inactive api token", async () => {
+    const token = services.find((service) => service.active === false)?.token;
+    if (!token) {
+      throw new Error("The test data should have at least one inactive api");
+    }
+    const response = await request(app).get(`/internal/users/email/${users[0].uuid}`).set("X-TOKEN-AUTH", token);
+    expect(response.status).toBe(401);
+  });
+
+  it("should 401 for expired api token", async () => {
+    const token = services.find((service) => service.name === "expired-api")?.token;
+    if (!token) {
+      throw new Error("The test data should have at least one expired api");
+    }
+    const response = await request(app).get(`/internal/users/email/${users[0].uuid}`).set("X-TOKEN-AUTH", token);
+    expect(response.status).toBe(401);
+  });
+
+  it("should 401 valid non email-service api service", async () => {
+    const token = services[0].token;
+    const response = await request(app).get(`/internal/users/email/${users[0].uuid}`).set("X-TOKEN-AUTH", token);
+    expect(response.status).toBe(401);
+  });
+
+  it("should not get any user if the API header is invalid", async () => {
+    const response = await request(app).get(`/internal/users/email/whatever`).set("X-TOKEN-AUTH", "randon-token");
+    expect(response.status).toBe(401);
+  });
+});
