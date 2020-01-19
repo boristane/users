@@ -22,5 +22,11 @@
     "token": "6640c9c8fdbf0019224d82bd16dcc47fa6a3fe6fd9d7814f33b007ff30ae3de0",
     "active": false,
     "expires": "2030-10-10"
+  },
+  {
+    "name": "email-service",
+    "token": "6640c9c8fdbf0019224d82bd16dcc47fa6a3fe6fd9d7814f33b007ff30ae3de1",
+    "active": false,
+    "expires": "2030-10-10"
   }
 ]
