@@ -1,4 +1,4 @@
-import { SNS } from "aws-sdk";
+import AWS, { SNS } from "aws-sdk";
 import logger from "logger";
 
 export async function publishToSNS(topicARN: string, message: ISNSMessage, correlationId: string) {
@@ -12,6 +12,7 @@ export async function publishToSNS(topicARN: string, message: ISNSMessage, corre
       region,
     });
   } else {
+    setAWSCredentials();
     producer = new SNS({
       region,
       endpoint,
@@ -44,6 +45,14 @@ export async function publishToSNS(topicARN: string, message: ISNSMessage, corre
       error,
     });
   }
+}
+
+export function setAWSCredentials() {
+  // This is used in local dev only, as both in prod and uat the credentials are from the task definition
+  AWS.config.update({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  });
 }
 
 export interface ISNSMessage {
