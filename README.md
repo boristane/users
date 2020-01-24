@@ -18,8 +18,42 @@ The module managing users
 | JWT_ADMINS_KEY         | The key to sign admins json web tokens |
 | USERS_SNS_TOPIC_ARN    | The sns to send all users events       |
 | SNS_REGION             | The sns region                         |
-| SNS_ENDPOINT           | The sns endpoint                       |
+| SNS_ENDPOINT           | The sns endpoint (for local dev)       |
 | FORGOTTEN_PASSWORD_URL | The url to redirect to reset password  |
+
+## Running Locally
+
+```bash
+make local
+```
+
+It starts the server an listen to port `8080`.
+
+## Testing
+
+Make sure there are no other `mysql` and `localstack` containers running on the machine to avoid port or name conflict.
+
+```bash
+make test
+```
+
+## Debugging
+
+Debugging is set-up for VS-Code. Simply select the desired option from the debugging drop down.
+
+`Current TS File`: Run the current TS file with the debugger attached.
+`Jest Current TS File`: Run the current test file with jest and the debugger attached.
+
+## Deploying
+
+There are two options to deploy this service.
+
+* Boot up the container in a server instance
+* Run the server on an AWS lambda
+
+```bash
+npm run deploy:dev
+```
 
 ## Functionality
 
