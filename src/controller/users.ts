@@ -86,7 +86,8 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
     newUser.activationTokens = [activationToken];
 
     const result = await userRepository.save(newUser);
-    sendActivationTokenEmail(user, token, expires, correlationId);
+    newUser.activationTokens = [];
+    sendActivationTokenEmail(newUser, token, expires, correlationId);
 
     const response = {
       message: "User created successfully.",
@@ -387,6 +388,8 @@ export async function sendPasswordToken(req: Request, res: Response, next: NextF
       isUsed: false,
     };
     user.activationTokens?.push(passwordToken);
+    await getRepository(User).save(user);
+    user.activationTokens = [];
     sendPasswordResetTokenEmail(user, token, expires, correlationId);
     res.status(200).json({
       message: "Forgotten password token sent.",

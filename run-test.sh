@@ -11,6 +11,8 @@ fi
 
 docker-compose up -d
 
+sleep 15
+
 # Check that mysql is ready before creating the database
 # while ! docker exec mysql_users mysqladmin --user=root --password=password --host "127.0.0.1" ping --silent &> /dev/null ; do
 #   sleep 2

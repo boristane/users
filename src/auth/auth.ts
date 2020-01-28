@@ -42,7 +42,7 @@ export async function apiAuth(req: Request, res: Response, next: NextFunction) {
     }
     const api = await getRepository(APIService).findOneOrFail({token});
     api.lastUsed = new Date();
-    await getRepository(APIService).save(api);
+    // await getRepository(APIService).save(api);
     res.locals.apiData = api;
     next();
   } catch (error) {
