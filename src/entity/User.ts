@@ -16,8 +16,8 @@ export class User {
   @Column()
   forename!: string;
 
-  @Column()
-  surname!: string;
+  @Column({ nullable: true })
+  surname?: string;
 
   @Column()
   password!: string;

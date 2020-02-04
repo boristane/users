@@ -68,7 +68,6 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
     const newUser: User = {
       uuid: uuid(),
       forename,
-      surname,
       email,
       phone,
       password: hashedPassword,
