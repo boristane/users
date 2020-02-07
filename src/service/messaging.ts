@@ -1,8 +1,8 @@
-import { NotificationService } from "messaging/lib";
+import { Messaging } from "messaging";
 import { User } from "../entity/User";
 
 export function initMessagingService() {
-  NotificationService.getInstance({
+  Messaging.getInstance({
     region: process.env.SNS_REGION || "",
     endpoint: process.env.SNS_ENDPOINT,
     source: "users",
@@ -17,12 +17,12 @@ enum eventType {
 
 async function signalSignup(user: User, token: string, expires: Date, correlationId: string) {
   const message = { type: eventType.signup, data: { user: getEmailUser(user), token, expires: expires.toISOString() }, correlationId }
-  await NotificationService.getInstance().publish(message);
+  await Messaging.getInstance().publish(message);
 }
 
 async function signalPasswordResetToken(user: User, token: string, expires: Date, correlationId: string) {
   const message = { type: eventType.resetPassword, data: { user: getEmailUser(user), token, expires: expires.toISOString() }, correlationId }
-  await NotificationService.getInstance().publish(message);
+  await Messaging.getInstance().publish(message);
 }
 
 function getEmailUser(user: User) {
