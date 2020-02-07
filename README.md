@@ -16,7 +16,7 @@ The module managing users
 | DB_NAME                | The database name                      |
 | JWT_USERS_KEY          | The key to sign users json web tokens  |
 | JWT_ADMINS_KEY         | The key to sign admins json web tokens |
-| USERS_SNS_TOPIC_ARN    | The sns to send all users events       |
+| SNS_TOPIC_ARN          | The sns to send all users events       |
 | SNS_REGION             | The sns region                         |
 | SNS_ENDPOINT           | The sns endpoint (for local dev)       |
 | FORGOTTEN_PASSWORD_URL | The url to redirect to reset password  |

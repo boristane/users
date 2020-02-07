@@ -1,6 +1,3 @@
-import { publishToSNS } from "./sns-helper";
-import { User } from "../entity/User";
-
 export function createToken(): { token: string; expires: Date } {
   const validForHours = 2;
   const expires = new Date();
@@ -10,24 +7,6 @@ export function createToken(): { token: string; expires: Date } {
     token: generateRandomAlphaNumString(16),
   };
   return token;
-}
-
-export async function sendActivationTokenEmail(user: User, token: string, expires: Date, correlationId: string) {
-  const message = { type: "ACTIVATE_ACCOUNT", data: { user: getEmailUser(user), token, expires: expires.toISOString() }, correlationId }
-  const topicArn = process.env.USERS_SNS_TOPIC_ARN || "";
-  await publishToSNS(topicArn, message, correlationId);
-}
-
-export async function sendPasswordResetTokenEmail(user: User, token: string, expires: Date, correlationId: string) {
-  const message = { type: "PASSWORD_RESET_TOKEN", data: { user: getEmailUser(user), token, expires: expires.toISOString() }, correlationId }
-  const topicArn = process.env.USERS_SNS_TOPIC_ARN || "";
-  await publishToSNS(topicArn, message, correlationId);
-}
-
-function getEmailUser(user: User) {
-  const result = { ...user };
-  result.password = "";
-  return result;
 }
 
 export function generateRandomAlphaNumString(length: number) {

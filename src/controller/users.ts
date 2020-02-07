@@ -6,10 +6,11 @@ import { sign } from "jsonwebtoken";
 import { ActivationToken } from "../entity/ActivationToken";
 import { send404, send409, send500, send401, send410 } from "../utils/http-error-responses";
 import { ISignupRequest, ILoginRequest, IEditRequest } from "../schema/users";
-import { createToken, sendActivationTokenEmail, sendPasswordResetTokenEmail } from "../utils/activation-tokens";
+import { createToken } from "../utils/activation-tokens";
 import logger from "logger";
 import { getTokenPayload } from "../auth/auth";
 import uuid from "uuid/v4";
+import messaging from "../service/messaging";
 
 export async function getAll(req: Request, res: Response, next: NextFunction) {
   const correlationId = res.get("x-correlation-id") || "";
@@ -86,7 +87,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
 
     const result = await userRepository.save(newUser);
     newUser.activationTokens = [];
-    sendActivationTokenEmail(newUser, token, expires, correlationId);
+    messaging.signalSignup(newUser, token, expires, correlationId);
 
     const response = {
       message: "User created successfully.",
@@ -389,7 +390,7 @@ export async function sendPasswordToken(req: Request, res: Response, next: NextF
     user.activationTokens?.push(passwordToken);
     await getRepository(User).save(user);
     user.activationTokens = [];
-    sendPasswordResetTokenEmail(user, token, expires, correlationId);
+    messaging.signalPasswordResetToken(user, token, expires, correlationId);
     res.status(200).json({
       message: "Forgotten password token sent.",
     });
