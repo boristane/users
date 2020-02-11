@@ -130,6 +130,7 @@ export async function getMe(req: Request, res: Response, next: NextFunction) {
       message: "User found.",
       user: {
         id: user.id,
+        uuid: user.uuid,
         forename: user.forename,
         surname: user.surname,
         email: user.email,
