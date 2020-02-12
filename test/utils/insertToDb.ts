@@ -5,6 +5,7 @@ import { ActivationToken } from "../../src/entity/ActivationToken";
 import moment = require("moment");
 import { Admin } from "../../src/entity/Admin";
 import { APIService } from "../../src/entity/APIService";
+import { createEncryptionKey } from "../../src/utils/tokens";
 
 export function insertUsers(users: Array<ITestUser>) {
   const promises = users.map(async (user, index) => {
@@ -22,6 +23,7 @@ export function insertUsers(users: Array<ITestUser>) {
       updated: new Date(),
       activated: false,
       optInMarketing: false,
+      encryptionKey: createEncryptionKey(),
     };
     return await getRepository(User).insert(newUser);
   });

@@ -1,4 +1,4 @@
-import { createToken } from "../../src/utils/activation-tokens"
+import { createToken, createEncryptionKey } from "../../src/utils/tokens"
 import { promisify } from "util";
 import setupDb from "../utils/setupDb";
 import { createConnectionToDB } from "../../src/utils/db-helper";
@@ -35,5 +35,14 @@ describe("Activation token generation", () => {
     const result = createToken();
     const now = new Date();
     expect(result.expires.getHours()).toEqual(moment(now).add(2, "hours").hours());
+  });
+});
+
+
+describe("Encryption key generation", () => {
+  it("Generates a valid key string", () => {
+    const result = createEncryptionKey();
+    expect(result).toBeTruthy();
+    expect(result.length).toEqual(16);
   });
 });

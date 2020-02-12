@@ -9,8 +9,9 @@ import tokens from "../data/activation-tokens.json";
 import { sign } from "jsonwebtoken";
 import setupDB from "../utils/setupDb";
 import { promisify } from "util";
-import { getRepository, getTreeRepository } from "typeorm";
+import { getRepository } from "typeorm";
 import { User } from "../../src/entity/User";
+import { initMessagingService } from "../../src/service/messaging";
 require("dotenv").config();
 
 jest.setTimeout(15000);
@@ -20,6 +21,7 @@ let connection;
 
 beforeAll(async () => {
   await setupDB();
+  await initMessagingService();
   sleep(2000);
   connection = await createConnectionToDB();
 });

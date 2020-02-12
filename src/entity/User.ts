@@ -31,6 +31,9 @@ export class User {
   @Column({ unique: true, nullable: false })
   uuid!: string;
 
+  @Column({ nullable: false })
+  encryptionKey!: string;
+
   @CreateDateColumn()
   created?: Date;
 

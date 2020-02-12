@@ -6,7 +6,7 @@ import { APIService } from "../entity/APIService";
 import { IApiServiceCreateRequest, IApiServiceUpdateRequest } from "../schema/apiService";
 import moment from "moment";
 import { hash } from "bcryptjs";
-import { generateRandomAlphaNumString } from "../utils/activation-tokens";
+import { generateRandomAlphaNumString } from "../utils/tokens";
 
 export async function getAll(req: Request, res: Response, next: NextFunction) {
   const correlationId = res.get("x-correlation-id") || "";

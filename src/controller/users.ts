@@ -6,7 +6,7 @@ import { sign } from "jsonwebtoken";
 import { ActivationToken } from "../entity/ActivationToken";
 import { send404, send409, send500, send401, send410 } from "../utils/http-error-responses";
 import { ISignupRequest, ILoginRequest, IEditRequest } from "../schema/users";
-import { createToken } from "../utils/activation-tokens";
+import { createToken, createEncryptionKey } from "../utils/tokens";
 import logger from "logger";
 import { getTokenPayload } from "../auth/auth";
 import uuid from "uuid/v4";
@@ -74,6 +74,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
       password: hashedPassword,
       activated: false,
       optInMarketing: false,
+      encryptionKey: createEncryptionKey(),
     };
 
     const { token, expires } = createToken();
@@ -133,6 +134,7 @@ export async function getMe(req: Request, res: Response, next: NextFunction) {
         uuid: user.uuid,
         forename: user.forename,
         surname: user.surname,
+        encryptionKey: user.encryptionKey,
         email: user.email,
         phone: user.phone,
         created: user.created,

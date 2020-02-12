@@ -9,6 +9,10 @@ export function createToken(): { token: string; expires: Date } {
   return token;
 }
 
+export function createEncryptionKey(): string {
+  return generateRandomAlphaNumString(16);
+}
+
 export function generateRandomAlphaNumString(length: number) {
   const chars =
     "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
