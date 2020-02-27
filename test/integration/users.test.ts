@@ -316,8 +316,7 @@ describe("Check forgotten password token", () => {
     const token = tokens[0];
     const response = await request(app).get(`/users/password-token/${token.token}`);
     expect(response.status).toBe(200);
-    expect(response.header['location']).toEqual(process.env.FORGOTTEN_PASSWORD_URL);
-    expect(response.header['token']).toEqual(token.token);
+    expect(response.header['location']).toEqual(`${process.env.FORGOTTEN_PASSWORD_URL || ""}/?token=${token.token}`);
   });
 
   it("should reject an expired token", async () => {

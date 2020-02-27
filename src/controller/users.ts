@@ -430,8 +430,7 @@ export async function checkPasswordToken(req: Request, res: Response, next: Next
       return next();
     }
 
-    res.header("token", t.token);
-    res.redirect(200, process.env.FORGOTTEN_PASSWORD_URL || "");
+    res.redirect(200, `${process.env.FORGOTTEN_PASSWORD_URL || ""}/?token=${token}`);
     next();
   } catch (err) {
     const message = "Unexpected error when getting token to reset password";
