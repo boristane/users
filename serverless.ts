@@ -7,13 +7,7 @@ const handler = serverless(app);
 
 export const server = async (event: any, context: any) => {
   await createConnectionToDB();
-  logger.info({
-    message: "Users started",
-    data: {
-      event,
-    },
-    correlationId: ""
-  })
+  logger.info("Users started", { event });
   return handler(event, context);
 }
 

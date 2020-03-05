@@ -7,7 +7,6 @@ import { APIService } from "../entity/APIService";
 import moment = require("moment");
 
 export async function getUser(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const api = res.locals.apiData as APIService;
     if (!api.isActive || moment(api.expires).isBefore(moment.now())) {
@@ -38,19 +37,13 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
     next();
   } catch (err) {
     const message = "Unexpected error when getting user";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, })
     send500(res, { message }, err);
     return next();
   }
 }
 
 export async function getUserEmail(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const api = res.locals.apiData as APIService;
     if (api.name !== "email-service" || !api.isActive || moment(api.expires).isBefore(moment.now())) {
@@ -81,12 +74,7 @@ export async function getUserEmail(req: Request, res: Response, next: NextFuncti
     next();
   } catch (err) {
     const message = "Unexpected error when getting user";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, })
     send500(res, { message }, err);
     return next();
   }

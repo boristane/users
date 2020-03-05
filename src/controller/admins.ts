@@ -9,7 +9,6 @@ import logger from "logger";
 import { getTokenPayload } from "../auth/auth";
 
 export async function getAll(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const adminRepository = getRepository(Admin);
     const admins = await adminRepository.createQueryBuilder("admin").getMany();
@@ -42,19 +41,13 @@ export async function getAll(req: Request, res: Response, next: NextFunction) {
     return next();
   } catch (err) {
     const message = "Unexpected error when getting all admins";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err });
     send500(res, { message }, err);
     return next();
   }
 }
 
 export async function create(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
 
     const { email, username, password, isSuperAdmin, superAdmin: superAdminEmail } = req.body;
@@ -97,19 +90,13 @@ export async function create(req: Request, res: Response, next: NextFunction) {
     });
   } catch (err) {
     const message = "Unexpected error when creating admin";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, });
     send500(res, { message }, err);
     next();
   }
 }
 
 export async function login(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const { email, password }: ILoginRequest = req.body;
     const [admin,] = await getRepository(Admin).find({ where: { email } });
@@ -136,19 +123,13 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     next();
   } catch (err) {
     const message = "Unexpected error when logging in admin";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, });
     send500(res, { message }, err);
     next();
   }
 }
 
 export async function del(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const { id } = req.params;
     const { admin: adminEmail } = req.body;
@@ -174,12 +155,7 @@ export async function del(req: Request, res: Response, next: NextFunction) {
     next();
   } catch (err) {
     const message = "Unexpected error when deleting admin";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, });
     send500(res, { message }, err);
     next();
   }

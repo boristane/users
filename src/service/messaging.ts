@@ -1,5 +1,6 @@
 import { Messaging } from "messaging";
 import { User } from "../entity/User";
+import logger from "logger";
 
 export function initMessagingService() {
   Messaging.getInstance({
@@ -15,13 +16,13 @@ enum eventType {
   resetPassword = "RESET_PASSWORD"
 }
 
-async function signalSignup(user: User, token: string, expires: Date, correlationId: string) {
-  const message = { type: eventType.signup, data: { user: getEmailUser(user), token, expires: expires.toISOString() }, correlationId }
+async function signalSignup(user: User, token: string, expires: Date) {
+  const message = { type: eventType.signup, data: { user: getEmailUser(user), token, expires: expires.toISOString() }, correlationId: logger.getCorrelationId() }
   await Messaging.getInstance().publish(message);
 }
 
-async function signalPasswordResetToken(user: User, token: string, expires: Date, correlationId: string) {
-  const message = { type: eventType.resetPassword, data: { user: getEmailUser(user), token, expires: expires.toISOString() }, correlationId }
+async function signalPasswordResetToken(user: User, token: string, expires: Date) {
+  const message = { type: eventType.resetPassword, data: { user: getEmailUser(user), token, expires: expires.toISOString() }, correlationId: logger.getCorrelationId() }
   await Messaging.getInstance().publish(message);
 }
 

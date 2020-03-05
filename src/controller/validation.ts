@@ -7,7 +7,6 @@ import { validateApiServiceRequest } from "./validation/apiService";
 import { validateInternalRequest } from "./validation/internal";
 
 export async function validateRequest(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   const { path } = req;
   const [, baseUrl,] = path.split("/")
   let validated = false;
@@ -23,29 +22,21 @@ export async function validateRequest(req: Request, res: Response, next: NextFun
     }
     if (validated) { return next(); }
 
-    logger.error({
-      message: "Unknown request",
-      data: {
-        body: req.body,
-        query: req.query,
-        method: req.method,
-        path,
-        baseUrl,
-      },
-      correlationId,
+    logger.error("Unknown request", {
+      body: req.body,
+      query: req.query,
+      method: req.method,
+      path,
+      baseUrl,
     });
     return next();
   } catch (err) {
-    logger.error({
-      message: "Failed validating a request",
-      data: {
-        url: req.url,
-        body: req.body,
-        query: req.query,
-        method: req.method,
-      },
+    logger.error("Failed validating a request", {
+      url: req.url,
+      body: req.body,
+      query: req.query,
+      method: req.method,
       error: err,
-      correlationId,
     });
     send400(res, { message: "Bad request, does not match schema", target: err.errors }, err);
   }

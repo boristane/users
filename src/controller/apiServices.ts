@@ -9,7 +9,6 @@ import { hash } from "bcryptjs";
 import { generateRandomAlphaNumString } from "../utils/tokens";
 
 export async function getAll(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const services = await getRepository(APIService).createQueryBuilder("apiService").getMany();
 
@@ -33,19 +32,13 @@ export async function getAll(req: Request, res: Response, next: NextFunction) {
     return next();
   } catch (err) {
     const message = "Unexpected error when getting all api services";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, });
     send500(res, { message }, err);
     return next();
   }
 }
 
 export async function create(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const { name, expires }: IApiServiceCreateRequest = req.body;
     const [service,] = await getRepository(APIService).find({ name });
@@ -78,19 +71,13 @@ export async function create(req: Request, res: Response, next: NextFunction) {
     });
   } catch (err) {
     const message = "Unexpected error when creating API Service";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, });
     send500(res, { message }, err);
     next();
   }
 }
 
 export async function update(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const { id } = req.params;
     const { active }: IApiServiceUpdateRequest = req.body;
@@ -116,12 +103,7 @@ export async function update(req: Request, res: Response, next: NextFunction) {
     });
   } catch (err) {
     const message = "Unexpected error when updating API Service";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, })
     send500(res, { message }, err);
     next();
   }

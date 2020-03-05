@@ -19,10 +19,8 @@ export async function createConnectionToDB(): Promise<Connection> {
     const connection = await createConnection(connectionOptions);
     return connection;
   } catch (err) {
-    logger.error({
-      message: "Unable to connect to database",
+    logger.error("Unable to connect to database", {
       data: connectionOptions,
-      correlationId: "",
       error: err,
     });
     process.exit(1);
@@ -34,12 +32,7 @@ export async function pingDB(): Promise<boolean> {
     await getConnection().query("SELECT 1");
     return true;
   } catch (error) {
-    logger.error({
-      message: "There was a problem pinging the database",
-      error,
-      data: {},
-      correlationId: "",
-    });
+    logger.error("There was a problem pinging the database", { error, });
     return false;
   }
 }

@@ -17,19 +17,13 @@ function requestLogger(
   next: NextFunction
 ) {
   if (!suppressLoggingPaths.includes(req.url)) {
-    const correlationId: string = req.header("x-correlation-id") || uuid();
-    logger.info({
-      message: "REQUEST",
-      data: {
-        url: req.url,
-        body: req.body,
-        query: req.query,
-        method: req.method,
-        token: req.headers.authorization,
-      },
-      correlationId,
+    logger.info("REQUEST", {
+      url: req.url,
+      body: req.body,
+      query: req.query,
+      method: req.method,
+      token: req.headers.authorization,
     });
-    res.set("x-correlation-id", correlationId);
   }
   next();
 }
@@ -40,14 +34,10 @@ function responseLogger(
   next: express.NextFunction
 ) {
   if (!suppressLoggingPaths.includes(req.url)) {
-    logger.info({
-      message: "RESPONSE",
-      data: {
-        statusCode: res.statusCode,
-        locals: res.locals,
-        url: req.url,
-      },
-      correlationId: res.get("x-correlation-id"),
+    logger.info("RESPONSE", {
+      statusCode: res.statusCode,
+      locals: res.locals,
+      url: req.url,
     });
   }
   next();
@@ -56,14 +46,15 @@ function responseLogger(
 async function healthCheck(req: Request, res: Response, next: NextFunction) {
   const dbStatus = await pingDB();
   if (!dbStatus) {
-    send500(res, {message: "There was a problem connecting to the Database"});
+    send500(res, { message: "There was a problem connecting to the Database" });
     return next();
   }
-  res.status(200).json({message: "All Good"});
+  res.status(200).json({ message: "All Good" });
   return next();
 }
 
 export const app = express();
+app.use(logger.bindExpressMiddleware);
 
 app.use(express.json());
 app.use(requestLogger);

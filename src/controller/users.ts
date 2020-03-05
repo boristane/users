@@ -13,7 +13,6 @@ import uuid from "uuid/v4";
 import messaging from "../service/messaging";
 
 export async function getAll(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const userRepository = getRepository(User);
     const users = await userRepository.createQueryBuilder("user").getMany();
@@ -41,19 +40,13 @@ export async function getAll(req: Request, res: Response, next: NextFunction) {
     return next();
   } catch (err) {
     const message = "Unexpected error when getting all users";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, })
     send500(res, { message }, err);
     return next();
   }
 }
 
 export async function signup(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const { email, forename, surname, password, phone }: ISignupRequest = req.body;
     const userRepository = getRepository(User);
@@ -88,7 +81,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
 
     const result = await userRepository.save(newUser);
     newUser.activationTokens = [];
-    messaging.signalSignup(newUser, token, expires, correlationId);
+    messaging.signalSignup(newUser, token, expires);
 
     const response = {
       message: "User created successfully.",
@@ -106,19 +99,13 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
     next();
   } catch (err) {
     const message = "Unexpected error when creating user";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, })
     send500(res, { message }, err);
     next();
   }
 }
 
 export async function getMe(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const { userData } = res.locals;
     if (!userData) {
@@ -151,19 +138,13 @@ export async function getMe(req: Request, res: Response, next: NextFunction) {
     next();
   } catch (err) {
     const message = "Error getting user (me)";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, })
     send500(res, { message }, err);
     next();
   }
 }
 
 export async function login(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   const { email, password }: ILoginRequest = req.body;
   try {
     const [user,] = await getRepository(User).find({ email });
@@ -190,19 +171,13 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     next();
   } catch (err) {
     const message = "Unexpected error when logging in user";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, })
     send500(res, { message }, err);
     next();
   }
 }
 
 export async function getOne(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   const { id } = req.params;
   try {
     const [user,] = await getRepository(User).find({ id: Number(id) });
@@ -233,19 +208,13 @@ export async function getOne(req: Request, res: Response, next: NextFunction) {
     next();
   } catch (err) {
     const message = "Error getting user";
-    logger.error({
-      message,
-      data: req.params,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, })
     send500(res, { message }, err);
     next();
   }
 }
 
 export async function edit(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const { id } = req.params;
     const { forename, surname, phone, optInMarketing, email }: IEditRequest = req.body;
@@ -282,19 +251,13 @@ export async function edit(req: Request, res: Response, next: NextFunction) {
     next();
   } catch (err) {
     const message = "Error editing user";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, })
     send500(res, { message }, err);
     next();
   }
 }
 
 export async function del(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   const { id } = req.params;
   try {
     const user = await getRepository(User).findOne({ id: Number(id) });
@@ -313,19 +276,13 @@ export async function del(req: Request, res: Response, next: NextFunction) {
     next();
   } catch (err) {
     const message = "Unexpected error when deleting user";
-    logger.error({
-      message,
-      data: req.params,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, })
     send500(res, { message }, err);
     next();
   }
 }
 
 export async function activate(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const { token } = req.params;
     const t = await getRepository(ActivationToken).findOne({ where: { token }, relations: ["user"] });
@@ -362,19 +319,13 @@ export async function activate(req: Request, res: Response, next: NextFunction) 
     next();
   } catch (err) {
     const message = "Unexpected error when activating user";
-    logger.error({
-      message,
-      data: req.params,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.params, error: err, })
     send500(res, { message }, err);
     next();
   }
 }
 
 export async function sendPasswordToken(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const { email } = req.body;
     const user = await getRepository(User).findOne({ email });
@@ -393,26 +344,20 @@ export async function sendPasswordToken(req: Request, res: Response, next: NextF
     user.activationTokens?.push(passwordToken);
     await getRepository(User).save(user);
     user.activationTokens = [];
-    messaging.signalPasswordResetToken(user, token, expires, correlationId);
+    messaging.signalPasswordResetToken(user, token, expires);
     res.status(200).json({
       message: "Forgotten password token sent.",
     });
     next();
   } catch (err) {
     const message = "Unexpected error when getting token to reset password";
-    logger.error({
-      message,
-      data: req.body,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.body, error: err, })
     send500(res, { message }, err);
     next();
   }
 }
 
 export async function checkPasswordToken(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const { token } = req.params;
     const t = await getRepository(ActivationToken).findOne({ where: { token }, relations: ["user"] });
@@ -434,19 +379,13 @@ export async function checkPasswordToken(req: Request, res: Response, next: Next
     next();
   } catch (err) {
     const message = "Unexpected error when getting token to reset password";
-    logger.error({
-      message,
-      data: req.params,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.params, error: err, })
     send500(res, { message }, err);
     next();
   }
 }
 
 export async function resetPassword(req: Request, res: Response, next: NextFunction) {
-  const correlationId = res.get("x-correlation-id") || "";
   try {
     const { password, token } = req.body;
     const t = await getRepository(ActivationToken).findOne({ where: { token }, relations: ["user"] });
@@ -480,12 +419,7 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
     next();
   } catch (err) {
     const message = "Failed to reset the password";
-    logger.error({
-      message,
-      data: req.params,
-      error: err,
-      correlationId,
-    });
+    logger.error(message, { data: req.params, error: err, })
     send500(res, { message }, err);
     next();
   }
