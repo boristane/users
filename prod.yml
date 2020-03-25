@@ -1,0 +1,10 @@
+dbHost: mysql
+dbUser: root
+dbPass: password
+dbPort: 3306
+dbName: users
+jwtUsersKey: jwt-users-key
+jwtAdminsKey: jwt-admins-key
+snsTopicArn: arn:aws:sns:us-west-1:000000000000:users
+snsRegion: us-west-1
+forgottenPasswordUrl: 'http://google.com'
