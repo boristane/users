@@ -10,6 +10,11 @@ provider:
   region: eu-west-2
   logRetentionInDays: 7
   versionFunctions: false
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - sns:Publish
+      Resource: ${file(./${opt:stage}.yml):snsTopicArn}
 
   environment:
     ENV: ${opt:stage}
