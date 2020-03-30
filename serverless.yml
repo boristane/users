@@ -10,12 +10,17 @@ provider:
   region: eu-west-2
   logRetentionInDays: 7
   versionFunctions: false
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - sns:Publish
+      Resource: ${file(./${opt:stage}.yml):snsTopicArn}
 
   environment:
     ENV: ${opt:stage}
     DB_HOST: ${file(./${opt:stage}.yml):dbHost}
     DB_USER: ${file(./${opt:stage}.yml):dbUser}
-    DB_PASS: ${file(./${opt:stage}.yml):dbPass}
+    DB_PASS: ${ssm:/boristane/lesley/database/password~true}
     DB_PORT: ${file(./${opt:stage}.yml):dbPort}
     DB_NAME: ${file(./${opt:stage}.yml):dbName}
     JWT_USERS_KEY: ${file(./${opt:stage}.yml):jwtUsersKey}

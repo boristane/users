@@ -1,10 +1,9 @@
-dbHost: mysql
+dbHost: ec2-35-177-228-117.eu-west-2.compute.amazonaws.com
 dbUser: root
-dbPass: password
 dbPort: 3306
 dbName: users
-jwtUsersKey: jwt-users-key
-jwtAdminsKey: jwt-admins-key
-snsTopicArn: arn:aws:sns:us-west-1:000000000000:users
-snsRegion: us-west-1
+jwtUsersKey: hEU4uc96e9uPHsAN
+jwtAdminsKey: pdR7k7NSKwMgphaJ
+snsTopicArn: arn:aws:sns:eu-west-2:893175024177:users-topic
+snsRegion: eu-west-2
 forgottenPasswordUrl: 'http://google.com'
