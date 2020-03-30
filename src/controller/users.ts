@@ -11,6 +11,9 @@ import logger from "logger";
 import { getTokenPayload } from "../auth/auth";
 import uuid from "uuid/v4";
 import messaging from "../service/messaging";
+import { Membership } from "../entity/Membership";
+import { MembershipTier } from "../utils/utils";
+import moment from "moment";
 
 export async function getAll(req: Request, res: Response, next: NextFunction) {
   try {
@@ -59,6 +62,13 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
 
     const saltRounds = 10;
     const hashedPassword = await hash(password, saltRounds);
+    
+    const membership: Membership = {
+      tier: MembershipTier.basic,
+      expirationDate: moment((new Date())).add(5, "years").toDate(),
+      isActive: true,
+    };
+    
     const newUser: User = {
       uuid: uuid(),
       forename,
@@ -66,8 +76,8 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
       phone,
       password: hashedPassword,
       activated: false,
-      optInMarketing: false,
       encryptionKey: createEncryptionKey(),
+      memberships: [membership],
     };
 
     const { token, expires } = createToken();
@@ -78,7 +88,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
       isUsed: false,
     };
     newUser.activationTokens = [activationToken];
-
+    
     const result = await userRepository.save(newUser);
     newUser.activationTokens = [];
     messaging.signalSignup(newUser, token, expires);
@@ -95,6 +105,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
       }
     };
 
+    res.locals.body = response;
     res.status(201).json(response);
     next();
   } catch (err) {
@@ -113,7 +124,8 @@ export async function getMe(req: Request, res: Response, next: NextFunction) {
       return next();
     }
 
-    const user = await getRepository(User).findOneOrFail({ uuid: userData.uuid });
+    const user = await getRepository(User).findOneOrFail({ uuid: userData.uuid }, { relations: ["memberships"] });
+    const membership = user.memberships.find(sub => sub.isActive === true);
     const response = {
       message: "User found.",
       user: {
@@ -125,7 +137,8 @@ export async function getMe(req: Request, res: Response, next: NextFunction) {
         email: user.email,
         phone: user.phone,
         created: user.created,
-        updated: user.updated
+        updated: user.updated,
+        membership: membership?.tier,
       },
       request: {
         type: "GET",
@@ -217,7 +230,7 @@ export async function getOne(req: Request, res: Response, next: NextFunction) {
 export async function edit(req: Request, res: Response, next: NextFunction) {
   try {
     const { id } = req.params;
-    const { forename, surname, phone, optInMarketing, email }: IEditRequest = req.body;
+    const { forename, surname, phone, email }: IEditRequest = req.body;
     const user = await getRepository(User).findOne({ id: Number(id) });
 
     if (!user) {
@@ -232,7 +245,6 @@ export async function edit(req: Request, res: Response, next: NextFunction) {
     user.forename = forename || user.forename;
     user.surname = surname || user.surname;
     user.phone = phone || user.phone;
-    user.optInMarketing = optInMarketing || user.optInMarketing;
 
     const result = await getRepository(User).save(user);
     const response = {

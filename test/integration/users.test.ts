@@ -237,7 +237,6 @@ describe("edit", () => {
     const id = 1;
     const body = {
       forename: "Arnold",
-      optInMarketing: true,
       email: users[0].email,
     }
     const token = sign(users[1].email, process.env.JWT_USERS_KEY || "");
@@ -246,7 +245,6 @@ describe("edit", () => {
     const user = await getRepository(User).findOneOrFail({ id });
     expect(response.status).toEqual(200);
     expect(user.forename).toEqual(body.forename);
-    expect(user.optInMarketing).toEqual(body.optInMarketing);
   });
 });
 

@@ -6,11 +6,18 @@ import moment = require("moment");
 import { Admin } from "../../src/entity/Admin";
 import { APIService } from "../../src/entity/APIService";
 import { createEncryptionKey } from "../../src/utils/tokens";
+import { Membership } from "../../src/entity/Membership";
+import { MembershipTier } from "../../src/utils/utils";
 
 export function insertUsers(users: Array<ITestUser>) {
   const promises = users.map(async (user, index) => {
     const saltRounds = 10;
     const hashedPassword = await hash(user.password, saltRounds);
+    const membership: Membership = {
+      tier: MembershipTier.basic,
+      expirationDate: moment((new Date())).add(5, "years").toDate(),
+      isActive: true,
+    };
     const newUser: User = {
       id: index + 1,
       uuid: user.uuid,
@@ -22,10 +29,10 @@ export function insertUsers(users: Array<ITestUser>) {
       created: new Date(),
       updated: new Date(),
       activated: false,
-      optInMarketing: false,
       encryptionKey: createEncryptionKey(),
+      memberships: [membership],
     };
-    return await getRepository(User).insert(newUser);
+    return await getRepository(User).save(newUser);
   });
   return Promise.all(promises);
 }

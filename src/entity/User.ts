@@ -7,6 +7,7 @@ import {
   UpdateDateColumn
 } from "typeorm";
 import { ActivationToken } from "./ActivationToken";
+import { Membership } from "./Membership";
 
 @Entity()
 export class User {
@@ -45,13 +46,16 @@ export class User {
   })
   activated!: boolean;
 
-  @Column({
-    default: false
-  })
-  optInMarketing!: boolean;
-
   @OneToMany(type => ActivationToken, token => token.user, {
-    onDelete: "CASCADE"
+    onDelete: "CASCADE",
+    cascade: true,
   })
   activationTokens?: ActivationToken[];
+
+  @OneToMany(type => Membership, sub => sub.user, {
+    onDelete: "CASCADE",
+    cascade: true,
+    nullable: false,
+  })
+  memberships!: Membership[];
 }
