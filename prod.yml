@@ -4,6 +4,6 @@ dbPort: 3306
 dbName: users
 jwtUsersKey: hEU4uc96e9uPHsAN
 jwtAdminsKey: pdR7k7NSKwMgphaJ
-snsTopicArn: arn:aws:sns:eu-west-2:893175024177:users-topic
-snsRegion: eu-west-2
+snsTopicArn: arn:aws:sns:eu-west-2:893175024177:lesley-users-topic-prod
+region: eu-west-2
 forgottenPasswordUrl: 'http://google.com'
