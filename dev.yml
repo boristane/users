@@ -2,8 +2,6 @@ dbHost: ec2-35-177-228-117.eu-west-2.compute.amazonaws.com
 dbUser: root
 dbPort: 3306
 dbName: users
-jwtUsersKey: jwt-users-key
-jwtAdminsKey: jwt-admins-key
 snsTopicArn: arn:aws:sns:eu-west-1:893175024177:lesley-users-topic-dev
 region: eu-west-1
 forgottenPasswordUrl: 'http://google.com'
