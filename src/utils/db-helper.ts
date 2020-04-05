@@ -1,4 +1,4 @@
-import { createConnection, Connection, ConnectionOptions, getConnection } from "typeorm";
+import { createConnection, Connection, ConnectionOptions, getConnection, getConnectionManager } from "typeorm";
 import { ActivationToken } from "../entity/ActivationToken";
 import { User } from "../entity/User";
 import logger from "logger";
@@ -17,6 +17,10 @@ export async function createConnectionToDB(): Promise<Connection> {
     entities: [User, ActivationToken, Admin, APIService, Membership]
   };
   try {
+    const connectionManager = getConnectionManager();
+    if(connectionManager.has("default")) {
+      return connectionManager.get("default");
+    }
     const connection = await createConnection(connectionOptions);
     return connection;
   } catch (err) {
