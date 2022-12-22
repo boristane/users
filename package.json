@@ -15,7 +15,7 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "logger": "git+https://github.com/boristane/logger.git",
     "messaging": "git+https://github.com/boristane/messaging.git",
     "moment": "^2.24.0",
